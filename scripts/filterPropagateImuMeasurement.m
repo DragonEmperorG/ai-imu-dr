@@ -21,6 +21,7 @@ dt = inputImuMeasurement{1,1};
 dtdt = dt * dt;
 inputImuMeasurementAngulerSpeed = (inputImuMeasurement{1,2})';
 inputImuMeasurementAcceleration = (inputImuMeasurement{1,3})';
+inputPseudoMeasurementForwardVelocity = inputImuMeasurement{1,4};
 
 %%% Propagate
 propagateState1AngulerSpeed = inputImuMeasurementAngulerSpeed - inputFilterState4AngulerSpeedBias;
@@ -80,17 +81,30 @@ updateStateJacobianA = propagateState6Rotation * skew(propagateState7Transition'
 updateStateJacobianB = -skew(updateStateCarVelocityInCar);
 updateStateJacobianC = propagateState6Rotation * updateStateSkewAngularSpeedInImu;
 
-updateStateMeasurementTransitionH = zeros(2,inputFilterPSize);
-measurementIndex = [1 3];
-updateStateMeasurementTransitionH(1:2,4:6) = updateStateSOBracket3FromNavToCar(measurementIndex,:);
-updateStateMeasurementTransitionH(1:2,10:12) = updateStateJacobianA(measurementIndex,:);
-updateStateMeasurementTransitionH(1:2,16:18) = updateStateJacobianB(measurementIndex,:);
-updateStateMeasurementTransitionH(1:2,19:21) = updateStateJacobianC(measurementIndex,:);
-measurementCovarianceR = diag([15,8]);
+updateStateMeasurementTransitionH = zeros(3,inputFilterPSize);
+updateStateMeasurementTransitionH(1:3,4:6) = updateStateSOBracket3FromNavToCar;
+updateStateMeasurementTransitionH(1:3,10:12) = updateStateJacobianA;
+updateStateMeasurementTransitionH(1:3,16:18) = updateStateJacobianB;
+updateStateMeasurementTransitionH(1:3,19:21) = updateStateJacobianC;
+
+
+
+useDeeplearnedMeasurement = true;
+if useDeeplearnedMeasurement
+    measurementCovarianceR = diag([3,3,3]);
+    measurementError = [0; inputPseudoMeasurementForwardVelocity(2); 0] - updateStateCarVelocityInCar;
+else    
+    measurementIndex = [1 3];
+    updateStateMeasurementTransitionH = updateStateMeasurementTransitionH(measurementIndex,:);
+    % measurementCovarianceR = diag([15,8]);
+    measurementCovarianceR = diag([3,3]);
+    measurementError = - updateStateCarVelocityInCar;
+end
+
 updateStateMeasurementTransitionS = updateStateMeasurementTransitionH * propagateStateCovariance * updateStateMeasurementTransitionH' + measurementCovarianceR;
 updateStateMeasurementTransitionK = (linsolve(updateStateMeasurementTransitionS,(propagateStateCovariance * updateStateMeasurementTransitionH')'))';
 
-updateStateMeasurementTransitionDeltaX = updateStateMeasurementTransitionK * (- updateStateCarVelocityInCar(measurementIndex,:));
+updateStateMeasurementTransitionDeltaX = updateStateMeasurementTransitionK * measurementError;
 updateStateSESubscript4Bracket3RotationElement = updateStateMeasurementTransitionDeltaX(1:3);
 updateStateSESubscript4Bracket3RotationElementNorm = norm(updateStateSESubscript4Bracket3RotationElement);
 updateStateSESubscript4Bracket3RotationElementAxis = updateStateSESubscript4Bracket3RotationElement / updateStateSESubscript4Bracket3RotationElementNorm;
