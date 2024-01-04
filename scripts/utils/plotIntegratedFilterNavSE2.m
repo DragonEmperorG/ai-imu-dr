@@ -1,19 +1,20 @@
-function [] = plotPreprocessGroundTruthSE2(folderPath)
+function [] = plotIntegratedFilterNavSE2(folderPath)
 %UNTITLED2 此处显示有关此函数的摘要
 %   此处显示详细说明
 
-preprocessRawFlatData = loadPreprocessRawFlat(folderPath);
+filterState = loadFilterStateIntegratedGroundTruth(folderPath);
 
 printFolderPath = fullfile(folderPath,'dayZeroOClockAlign');
-saveFigFileName = "GroundTruthSE2";
 
-preprocessRawFlatDataSize = size(preprocessRawFlatData,1);
-preprocessTime = getPreprocessTime(preprocessRawFlatData);
-preprocessTimeDiff = diff(preprocessTime);
-preprocessSampleIntervalTime = mean(preprocessTimeDiff);
-preprocessGroundTruthNavOrientation = getPreprocessGroundTruthNavOrientationRotationMatrix(preprocessRawFlatData);
-preprocessGroundTruthNavVelocity = getPreprocessGroundTruthNavVelocity(preprocessRawFlatData);
-preprocessGroundTruthNavPosition = getPreprocessGroundTruthNavPosition(preprocessRawFlatData);
+% filterState = filterState(1:10000,:);
+
+filterStateSize = size(filterState,1);
+filterStateTime = getFilterStateTime(filterState);
+filterStateTimeDiff = diff(filterStateTime);
+filterStateSampleIntervalTime = mean(filterStateTimeDiff);
+filterStateNavOrientation = getFilterStateNavOrientation(filterState);
+filterStateNavVelocity = getFilterStateNavVelocity(filterState);
+filterStateNavPosition = getFilterStateNavPosition(filterState);
 
 
 figureHandle = figure;
@@ -29,10 +30,10 @@ pCarCoordinateAxisYLineLength = pCarYLength * pCarCoordinateAxisScale;
 pCarCoordinateAxisZLineLength = pCarZLength * pCarCoordinateAxisScale;
 pCarCoordinateAxisLineWidth = 1;
 pSampleIntervalTime = 1;
-pSampleIntervalIndex = pSampleIntervalTime / preprocessSampleIntervalTime;
-pSampleIndex = 1:pSampleIntervalIndex:preprocessRawFlatDataSize;
-pOrientation = preprocessGroundTruthNavOrientation(:,:,pSampleIndex);
-pPosition = preprocessGroundTruthNavPosition(pSampleIndex,:);
+pSampleIntervalIndex = round(pSampleIntervalTime / filterStateSampleIntervalTime);
+pSampleIndex = 1:pSampleIntervalIndex:filterStateSize;
+pOrientation = filterStateNavOrientation(:,:,pSampleIndex);
+pPosition = filterStateNavPosition(pSampleIndex,:);
 pLength = size(pPosition,1);
 for i = 1:pLength
     sensorCoordinateAxisInSensorCoordinateSystem = [0 0 0 1; pCarCoordinateAxisXLineLength 0 0 1; 0 0 0 1; 0 pCarCoordinateAxisYLineLength 0 1; 0 0 0 1; 0 0 pCarCoordinateAxisZLineLength 1]';
@@ -44,6 +45,6 @@ for i = 1:pLength
 end
 
 hold off;
-close(figureHandle);
+% close(figureHandle);
 
 end
