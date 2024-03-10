@@ -1,6 +1,8 @@
-function [] = plotFilterStateNavSE2(folderPath)
+function [] = plotFilterStateErrorNavSE2(folderPath)
 %UNTITLED2 此处显示有关此函数的摘要
 %   此处显示详细说明
+
+TAG = 'plotFilterStateErrorNavSE2';
 
 preprocessRawFlatData = loadPreprocessRawFlat(folderPath);
 preprocessTime = getPreprocessTime(preprocessRawFlatData);
@@ -26,8 +28,7 @@ timeReferenceSubPlotColumns = 1;
 pX = filterStateTime - filterStateTimeFloor;
 
 axesObject1 = subplot(timeReferenceSubPlotRows,timeReferenceSubPlotColumns,1);
-pY1 = filterStateNavOrientationEulerAngleDeg;
-pY1g = preprocessGroundTruthNavOrientationEulerAngleDeg;
+pY1 = filterStateNavOrientationEulerAngleDeg - preprocessGroundTruthNavOrientationEulerAngleDeg;
 hold on;
 lineObject11 = plot(pX,pY1(:,1));
 lineObject12 = plot(pX,pY1(:,2));
@@ -40,8 +41,7 @@ grid on;
 hold off;
 
 axesObject2 = subplot(timeReferenceSubPlotRows,timeReferenceSubPlotColumns,2);
-pY2 = filterStateNavVelocity;
-pY2g = preprocessGroundTruthNavVelocity;
+pY2 = filterStateNavVelocity - preprocessGroundTruthNavVelocity;
 hold on;
 lineObject21 = plot(pX,pY2(:,1));
 lineObject22 = plot(pX,pY2(:,2));
@@ -54,15 +54,11 @@ grid on;
 hold off;
 
 axesObject3 = subplot(timeReferenceSubPlotRows,timeReferenceSubPlotColumns,3);
-pY3 = filterStateNavPosition;
-pY3g = preprocessGroundTruthNavPosition;
+pY3 = filterStateNavPosition - preprocessGroundTruthNavPosition;
 hold on;
 lineObject31 = plot(pX,pY3(:,1));
 lineObject32 = plot(pX,pY3(:,2));
 lineObject33 = plot(pX,pY3(:,3));
-lineObject31g = plot(pX,pY3g(:,1));
-lineObject32g = plot(pX,pY3g(:,2));
-lineObject33g = plot(pX,pY3g(:,3));
 title('World Position');
 xlabel("Time (s)");
 ylabel("Value (m)");
@@ -81,13 +77,6 @@ set(lineObject23,'Color',"b");
 set(lineObject31,'Color',"r");
 set(lineObject32,'Color',"g");
 set(lineObject33,'Color',"b");
-set(lineObject31g,'Color',"r");
-set(lineObject32g,'Color',"g");
-set(lineObject33g,'Color',"b");
-
-set(lineObject31g,'LineStyle',"--");
-set(lineObject32g,'LineStyle',"--");
-set(lineObject33g,'LineStyle',"--");
 
 % 图例
 set(lineObject11,'DisplayName',"Pitch");
@@ -99,9 +88,6 @@ set(lineObject23,'DisplayName',"Up");
 set(lineObject31,'DisplayName',"East");
 set(lineObject32,'DisplayName',"North");
 set(lineObject33,'DisplayName',"Up");
-set(lineObject31g,'DisplayName',"GT East");
-set(lineObject32g,'DisplayName',"GT North");
-set(lineObject33g,'DisplayName',"GT Up");
 
 % Legend 属性
 % 字体
@@ -137,7 +123,7 @@ set(axesObject1,'FontSize',10);
 set(axesObject2,'FontSize',10);
 set(axesObject3,'FontSize',10);
 
-saveFigFileName = "StateNavSE2";
+saveFigFileName = "StateErrorNavSE2";
 saveFigFilePath = fullfile(printFolderPath,saveFigFileName);
 saveas(gcf,saveFigFilePath,'fig')
 
@@ -190,5 +176,24 @@ printFilePath = fullfile(printFolderPath,printFileName);
 exportgraphics(gcf,printFilePath,'Resolution',600)
 
 close(figureHandle);
+
+tailPositionError = preprocessGroundTruthNavPosition(end,:) - filterStateNavPosition(end,:);
+tailPositionErrorNorm = norm(tailPositionError);
+tailPositionErrorHorizontal = norm(tailPositionError(1:2));
+logMsg = sprintf('error: (%.3f, %.3f, %.3f),  norm: %.3f, horizontal: %.3f', ...
+    tailPositionError(1), tailPositionError(2),tailPositionError(3),...
+    tailPositionErrorNorm, tailPositionErrorHorizontal);
+log2terminal('I',TAG,logMsg);
+
+preprocessGroundTruthNavDeltaPosition = diff(preprocessGroundTruthNavPosition);
+preprocessGroundTruthNavDeltaDistance = sqrt(sum(preprocessGroundTruthNavDeltaPosition.*preprocessGroundTruthNavDeltaPosition,2));
+preprocessGroundTruthDistance = sum(preprocessGroundTruthNavDeltaDistance);
+preprocessGroundTruthDuration = preprocessTime(end) - preprocessTime(1);
+tailPositionErrorNorm100Percent = tailPositionErrorNorm / preprocessGroundTruthDistance * 100;
+tailPositionErrorHorizontal100Percent = tailPositionErrorHorizontal / preprocessGroundTruthDistance * 100;
+logMsg = sprintf('distance: %.3f, duration: %.0f,norm: %.2f %%, horizontal: %.2f %%', ...
+    preprocessGroundTruthDistance, preprocessGroundTruthDuration, ...
+    tailPositionErrorNorm100Percent, tailPositionErrorHorizontal100Percent);
+log2terminal('I',TAG,logMsg);
 
 end
