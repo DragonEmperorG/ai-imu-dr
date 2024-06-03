@@ -1,6 +1,6 @@
 % 重置工作区环境
 clearvars;
-% close all;
+close all;
 dbstop error;
 % clc;
 
@@ -50,14 +50,10 @@ if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     log2terminal('E',TAG,logMsg);
 else
     logTrackDenominator = cDatasetLevel4TrackFolderNameListLength;
-    % Head iterate drive_id
+    % Headjianzhi iterate drive_id
     for i = 1:cDatasetLevel4TrackFolderNameListLength
         logTrackNumerator = i;
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
-
-        % if i <= 2
-        %     continue;
-        % end
 
         if cDebug
             if ~strcmp(tDatasetLevel4TrackFolderName,"0009")
@@ -85,8 +81,9 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    % processIntegratedGroundTruth(tDatasetLevel5FolderPhonePath);
-                    processDataModelDrivenMethod(tDatasetLevel5FolderPhonePath);
+                    % plotFilterState(tDatasetLevel5FolderPhonePath);
+
+                    plotComparedTrackPositionDataDriven(tDatasetLevel5FolderPhonePath);
 
                 end
             end

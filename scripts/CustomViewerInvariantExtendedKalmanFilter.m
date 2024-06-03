@@ -10,7 +10,6 @@ TAG = 'CustomViewerInvariantExtendedKalmanFilter';
 
 SCRIPT_MODE = 0;
 
-
 % TODO: S1.1: 模型输入预处理文件夹 根目录
 % cDatasetFolderPath = 'C:\DoctorRelated\20230410重庆VDR数据采集';
 cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集';
@@ -88,8 +87,10 @@ else
     load(cTrainFilePath);
 end
 
+trackSynchronizedDataTime = cell2mat(trackSynchronizedData(:,1));
+
 spanResampledRawData = trackSynchronizedData;
-cCarCoordinateType = 'LFU';
+cCarCoordinateType = 'RFU';
 
 % TODO: S2.1: 自动加载基于深度学习的自适应参数
 cDeepLearnedCovarianceAvailable = false;
@@ -133,13 +134,15 @@ spanResampledRawDataSize = size(spanResampledRawData,1);
 % tailBiasEstimation = mean(measurement(tailBiasEstimationIndex,:),1);
 % headtailBiasEstimation = vertcat(headBiasEstimation,tailBiasEstimation);
 
-% spanResampledData = spanResampledRawData(1:spanResampledRawDataSize,:);
-% spanResampledData = spanResampledRawData(1:45200,:);
+spanResampledData = spanResampledRawData(1:spanResampledRawDataSize,:);
+% spanResampledData = spanResampledRawData(1:12000,:);
+% spanResampledData = spanResampledRawData(10000:12000,:);
 
 % spanResampledData = spanResampledRawData(11187:15187,:);
-spanResampledData = spanResampledRawData(12187:15187,:);
+% spanResampledData = spanResampledRawData(12187:15187,:);
 
-% spanResampledData = spanResampledRawData(6800:spanResampledRawDataSize,:);
+% spanResampledData = spanResampledRawData(2385:spanResampledRawDataSize,:);
+% spanResampledData = spanResampledRawData(1186:spanResampledRawDataSize,:);
 % spanResampledData = spanResampledRawData(9000:10000,:);
 spanResampledDataSize = size(spanResampledData,1);
 
@@ -271,11 +274,17 @@ filterInitQ(13:15,13:15) = eye(3) * cNoiseSOBracket3FromImuToCar;
 filterInitQ(16:18,16:18) = eye(3) * cNoiseTransitionFromImuToCar;
 filterIntermediateState{1,FIS_Q_SAVE_INDEX} = filterInitQ;
 
-measurementCovarianceR = zeros(2);
-% measurementCovarianceR(1,1) = 2;
-% measurementCovarianceR(2,2) = 21;
-measurementCovarianceR(1,1) = 15;
-measurementCovarianceR(2,2) = 8;
+% TODO: S2.4: 
+cDeepOdoFolderName = 'DATASET_DEEPODO';
+cDeepOdoPredictFileName = 'DeepOdoPredictData.txt';
+cDeepOdoPredictFilePath = fullfile(cPreprocessPhoneFolderPath,cDeepOdoFolderName,cDeepOdoPredictFileName);
+if isfile(cDeepOdoPredictFilePath)
+    dataDeepOdoPredictForwardVelocity = readmatrix(cDeepOdoPredictFilePath);
+    trackSynchronizedDataTimeStartCeil = ceil(trackSynchronizedDataTime(1));
+    trackSynchronizedDataTimeEndFloor = floor(trackSynchronizedDataTime(end));
+    dataDeepOdoPredictTime = (trackSynchronizedDataTimeStartCeil:trackSynchronizedDataTimeEndFloor)';
+    dataDeepOdoPredict = horzcat(dataDeepOdoPredictTime,dataDeepOdoPredictForwardVelocity);
+end
 
 if SCRIPT_MODE == 0
 
@@ -354,6 +363,8 @@ end
 
 for i =2:spanResampledDataSize
 
+    filterTimestamp = spanResampledData{i,1};
+
     filterIntermediateState{i,FIS_TIME_SAVE_INDEX} = spanResampledData{i,1};
     dt = filterIntermediateState{i,FIS_TIME_SAVE_INDEX} - filterIntermediateState{i-1,FIS_TIME_SAVE_INDEX};
     dtdt = dt * dt;
@@ -364,10 +375,10 @@ for i =2:spanResampledDataSize
     %     cAcceleration = ROTATION_FROM_IMU_TO_CAR * (spanResampledData{i-1,5})';
     %     cGyroscope = ROTATION_FROM_IMU_TO_CAR * (spanResampledData{i-1,4})';
 
-    % observationAngulerSpeed = (filterIntermediateState{i-1,FIS_ANGULAR_SPEED_SAVE_INDEX})';
-    % observationAcceleration = (filterIntermediateState{i-1,FIS_ACCELERATION_SAVE_INDEX})';
-    observationAngulerSpeed = (filterIntermediateState{i,FIS_ANGULAR_SPEED_SAVE_INDEX})';
-    observationAcceleration = (filterIntermediateState{i,FIS_ACCELERATION_SAVE_INDEX})';
+    observationAngulerSpeed = (filterIntermediateState{i-1,FIS_ANGULAR_SPEED_SAVE_INDEX})';
+    observationAcceleration = (filterIntermediateState{i-1,FIS_ACCELERATION_SAVE_INDEX})';
+    % observationAngulerSpeed = (filterIntermediateState{i,FIS_ANGULAR_SPEED_SAVE_INDEX})';
+    % observationAcceleration = (filterIntermediateState{i,FIS_ACCELERATION_SAVE_INDEX})';
 
 
     filterState1Rotation = filterIntermediateState{i-1,FIS_SOBRACKET3_FROM_IMU_TO_NAV_SAVE_INDEX};
@@ -479,34 +490,68 @@ for i =2:spanResampledDataSize
     %%% Update
     updateStateSOBracket3FromCarToNav = propagateState1RotationEstimation * propagateState6Rotation;
     updateStateSOBracket3FromNavToCar = updateStateSOBracket3FromCarToNav';
-    updateStateVelocityInImu = propagateState1RotationEstimation' * propagateState2VelocityEstimation;
-    updateStateVelocityInCar = updateStateSOBracket3FromCarToNav' * propagateState2VelocityEstimation;
-    updateStateVelocityPlusInCar = updateStateVelocityInCar + skew(propagateState7Transition') * propagateState1AngulerSpeed;
+    updateStateImuVelocityInImu = propagateState1RotationEstimation' * propagateState2VelocityEstimation;
+    updateStateImuVelocityInCar = updateStateSOBracket3FromNavToCar * propagateState2VelocityEstimation;
+    updateStateCarVelocityInCar = updateStateImuVelocityInCar + propagateState6Rotation' * skew(propagateState1AngulerSpeed') * propagateState7Transition;
     updateStateSkewAngularSpeedInImu = skew(propagateState1AngulerSpeed);
-    updateStateJacobianB = propagateState6Rotation' * skew(updateStateVelocityInImu);
-    updateStateJacobianC = -skew(propagateState7Transition');
+    updateStateJacobianA = propagateState6Rotation' * skew(propagateState7Transition');
+    updateStateJacobianB = -skew(updateStateCarVelocityInCar);
+    updateStateJacobianC = propagateState6Rotation' * updateStateSkewAngularSpeedInImu;    
 
-    updateStateMeasurementTransitionH = zeros(2,filterPSize);
-    if strcmp(cCarCoordinateType,'LFU')
-        measurementIndex = [1 3];
+    updateStateMeasurementTransitionHRaw = zeros(3,filterPSize);
+    updateStateMeasurementTransitionHRaw(:,4:6) = updateStateSOBracket3FromNavToCar;
+    updateStateMeasurementTransitionHRaw(:,10:12) = updateStateJacobianB;
+    updateStateMeasurementTransitionHRaw(:,16:18) = updateStateJacobianC;
+    updateStateMeasurementTransitionHRaw(:,19:21) = - updateStateSkewAngularSpeedInImu;
+
+    updateStateMeasurementVelocity = dataDeepOdoPredict(filterTimestamp==dataDeepOdoPredict(:,1),:);
+    if isempty(updateStateMeasurementVelocity)
+        measurementCovarianceR = zeros(2);
+        measurementCovarianceR(1,1) = 15;
+        measurementCovarianceR(2,2) = 8;
+        if cDeepLearnedCovarianceAvailable && cDeepLearnedCovarianceUse
+            measurementCovarianceR(1,1) = spanResampledData{i,6};
+            measurementCovarianceR(2,2) = spanResampledData{i,7};
+        end
+
+        if strcmp(cCarCoordinateType,'RFU')
+            measurementIndex = [1 3];
+        else
+            measurementIndex = [2 3];
+        end
+
+        updateStateMeasurementTransitionH = updateStateMeasurementTransitionHRaw(measurementIndex, :);
+        updateStateMeasurementError = - updateStateCarVelocityInCar(measurementIndex,:);
     else
-        measurementIndex = [2 3];
-    end
-    
-    updateStateMeasurementTransitionH(1:2,4:6) = updateStateSOBracket3FromNavToCar(measurementIndex,:);
-    updateStateMeasurementTransitionH(1:2,10:12) = updateStateJacobianB(measurementIndex,:);
-    updateStateMeasurementTransitionH(1:2,16:18) = updateStateJacobianC(measurementIndex,:);
-    updateStateMeasurementTransitionH(1:2,19:21) = - updateStateSkewAngularSpeedInImu(measurementIndex,:);
+        measurementCovarianceR = zeros(3);
 
-    if cDeepLearnedCovarianceAvailable && cDeepLearnedCovarianceUse
-        measurementCovarianceR(1,1) = spanResampledData{i,6};
-        measurementCovarianceR(2,2) = spanResampledData{i,7};
+        if strcmp(cCarCoordinateType,'RFU')
+            measurementIndex = [1 3];
+        else
+            measurementIndex = [2 3];
+        end
+
+        measurementCovarianceR(measurementIndex(1),measurementIndex(1)) = 15;
+        measurementCovarianceR(measurementIndex(2),measurementIndex(2)) = 8;
+        if cDeepLearnedCovarianceAvailable && cDeepLearnedCovarianceUse
+            measurementCovarianceR(measurementIndex(1),measurementIndex(1)) = spanResampledData{i,6};
+            measurementCovarianceR(measurementIndex(2),measurementIndex(2)) = spanResampledData{i,7};
+        end
+
+        measurementCovarianceR(2,2) = 2;
+
+        updateStateMeasurementTransitionH = updateStateMeasurementTransitionHRaw;
+        measurementCarVelocityInCar = zeros(3,1);
+        measurementCarVelocityInCar(2) = updateStateMeasurementVelocity(2);
+        updateStateMeasurementError = measurementCarVelocityInCar - updateStateCarVelocityInCar;
     end
+
+
 
     updateStateMeasurementTransitionS = updateStateMeasurementTransitionH * propagateStateCovariance * updateStateMeasurementTransitionH' + measurementCovarianceR;
     updateStateMeasurementTransitionK = (linsolve(updateStateMeasurementTransitionS,(propagateStateCovariance * updateStateMeasurementTransitionH')'))';
 
-    updateStateMeasurementTransitionDeltaX = updateStateMeasurementTransitionK * (- updateStateVelocityPlusInCar(measurementIndex,:));
+    updateStateMeasurementTransitionDeltaX = updateStateMeasurementTransitionK * updateStateMeasurementError;
     updateStateSESubscript4Bracket3RotationElement = updateStateMeasurementTransitionDeltaX(1:3);
     updateStateSESubscript4Bracket3RotationElementNorm = norm(updateStateSESubscript4Bracket3RotationElement);
     updateStateSESubscript4Bracket3RotationElementAxis = updateStateSESubscript4Bracket3RotationElement / updateStateSESubscript4Bracket3RotationElementNorm;
@@ -529,7 +574,7 @@ for i =2:spanResampledDataSize
     updateState2Velocity = updateStateSESubscript4Bracket3DeltaRotation * propagateState2VelocityEstimation + updateStateSESubscript4Bracket3DeltaVelocityInNav;
     
     % updateState2VelocityNorm = norm(updateState2Velocity);
-    % limitSpeed = 15;
+    % limitSpeed = 4.17;
     % limitVerticalSpeed = 0.5;
     % if updateState2VelocityNorm > limitSpeed
     %     updateState2Velocity = updateState2Velocity * limitSpeed / updateState2VelocityNorm;
@@ -665,7 +710,7 @@ for i =2:spanResampledDataSize
         nGroundTruthTranslation = spanResampledData{i,2}(1:3,4);
         nGroundTruthRotation = spanResampledData{i,2}(1:3,1:3);
 
-        if i == 5200
+        if i == 8000
             fprintf('%d', i);
         end
     end

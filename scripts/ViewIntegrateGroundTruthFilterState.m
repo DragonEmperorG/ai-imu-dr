@@ -43,6 +43,7 @@ cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameLi
 
 % TODO: S2.1: 配置调试模式
 cDebug = true;
+% cDebug = false;
 
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);
@@ -55,7 +56,7 @@ else
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
 
         if cDebug
-            if ~strcmp(tDatasetLevel4TrackFolderName,"0008")
+            if ~strcmp(tDatasetLevel4TrackFolderName,"0014")
                 continue;
             end
         end
@@ -80,7 +81,8 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    plotPreprocessGroundTruthSE2(tDatasetLevel5FolderPhonePath);
+                    % plotPreprocessGroundTruthSE2(tDatasetLevel5FolderPhonePath);
+                    % plotIntegratedFilterNavSE2(tDatasetLevel5FolderPhonePath);                
 
                     % plotPreprocessImuMeasurement(tDatasetLevel5FolderPhonePath);
 

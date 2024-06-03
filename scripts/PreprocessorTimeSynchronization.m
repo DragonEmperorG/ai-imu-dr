@@ -26,7 +26,7 @@ cDatasetCollectionDate = '2023_04_10';
 cReorganizedFolderName = 'Reorganized';
 cReorganizedFolderPath = fullfile(cDatasetFolderPath,cDatasetCollectionDate,cReorganizedFolderName);
 % TODO: S1.3: 配置数据集存储文件夹 采集轨迹编号
-cPreprocessTrackList = ["0006"];
+cPreprocessTrackList = ["0008"];
 % cPreprocessTrackList = ["0008" "0009" "0010" "0011" "0012" "0013" "0014" "0015" "0016"];
 cPreprocessTrackListLength = length(cPreprocessTrackList);
 % TODO: S1.4: 配置数据集存储文件夹 采集手机
@@ -37,10 +37,13 @@ cPhoneMapNumber = ["HUAWEI_Mate30"];
 % cPhoneMapNumber = ["GOOGLE_Pixel3" "HUAWEI_Mate30" "HUAWEI_P20"];
 kPhoneMapNumberLength = length(cPhoneMapNumber);
 
+% TODO: S2.1: 2023年04月 11|13|15日 这三天的数据由于SPAN输出的频率为200Hz, 需要处理真值的时间戳精度不足的问题
+isRecomputeTrackGroundTruthNavTime = false;
+cTrackGroundTruthNavFileName = 'TrackGroundTruthNav.csv';
+
 % 添加输入预处理粗切割存储文件夹
 load 'SmartPhoneDataConfig.mat';
 cDayZeroOClockAlignFolderName = 'dayZeroOClockAlign';
-cTrackGroundTruthNavFileName = 'TrackGroundTruthNav.csv';
 cTrackGroundTruthImuFileName = 'TrackGroundTruthImu.csv';
 % 添加输出预处理时间同步文件
 cResampledSynchronizationTimeOffsetFileName = 'ResampledSynchronizationTimeOffset.txt';
@@ -48,7 +51,6 @@ cTrackSynchronizedFileName = 'TrackSynchronized.csv';
 
 % DEBUG: 配置是否重新计算
 isRecomputeTrackSynchronizedFile = true;
-isRecomputeTrackGroundTruthNavTime = false;
 
 % DEBUG: 配置可视化时间同步传感器测量值
 cVisualizeCoarseClipData = 0;
@@ -357,9 +359,9 @@ for i = 1:cPreprocessTrackListLength
 
 
                         % Interpolate train data
-                        % synchronizeTimeBias = -globalSynchronizeTimeIndexSelected;
-                        synchronizeTimeBias = 15;
-                        prevTimeSynchronizationIndex = globalSynchronizeTimeIndexSelected;
+                        synchronizeTimeBias = -globalSynchronizeTimeIndexSelected;
+                        % synchronizeTimeBias = 15;
+                        % prevTimeSynchronizationIndex = globalSynchronizeTimeIndexSelected;
 
                         logMsg = sprintf('Date %s, track %s, phone %s, synchronize time bias %.3f s',cDatasetCollectionDate,tTrackFolderNameStr,tTrackSmartPhoneFolderNameChar,synchronizeTimeBias * resampleInterval);
                         log2terminal('I',TAG,logMsg);

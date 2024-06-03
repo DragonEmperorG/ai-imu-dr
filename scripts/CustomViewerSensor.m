@@ -33,18 +33,24 @@ TAG = 'CustomViewerSensor';
 
 % cDatasetFolderPath = 'C:\DoctorRelated\20230410重庆VDR数据采集\2023_04_10\HUAWEI\0003';
 
-cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_10\Reorganized\0008\HUAWEI_Mate30';
+% cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_10\Reorganized\0008\HUAWEI_Mate30';
+
+% cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_11\Reorganized\0002\HUAWEI_P20';
+
+cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_13\Reorganized\0008\HUAWEI_Mate30';
+
+% cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_13\Reorganized\0017\HUAWEI_Mate30';
 
 % cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_15\Reorganized\0003\GOOGLE_Pixel3';
 % cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_15\Reorganized\0001\HUAWEI_Mate30';
 
 
 
+% 添加输入原始数据集存储文件夹
 kRawFolderName = 'raw';
+load 'SmartPhoneDataConfig.mat';
 
-kMotionSensorAccelerometerUncalibratedFileName = 'PositionSensorMagneticFieldUncalibrated.csv';
-
-motionSensorAccelerometerUncalibratedFilePath = fullfile(cDatasetFolderPath,kRawFolderName,kMotionSensorAccelerometerUncalibratedFileName);
+motionSensorAccelerometerUncalibratedFilePath = fullfile(cDatasetFolderPath,kRawFolderName,kMotionSensorAccelerometerUncalibratedFileNameString);
 motionSensorAccelerometerUncalibratedRawData = readmatrix(motionSensorAccelerometerUncalibratedFilePath);
 if mean(motionSensorAccelerometerUncalibratedRawData(:,3)) == 0
     motionSensorAccelerometerUncalibratedRawData(:,3) = motionSensorAccelerometerUncalibratedRawData(:,1) * MS2NS - motionSensorAccelerometerUncalibratedRawData(:,2);
@@ -190,4 +196,22 @@ dActualEventTimeNanosGpsBaseStd = std(dActualEventTimeNanosGpsBase);
 dActualEventTimeNanosGpsBaseSampleRate = 1 / (dActualEventTimeNanosGpsBaseMean*NS2S);
 logMsg = sprintf('GNSS clock based sample rate: %.0f Hz, sample interval: min %.1f ms, max %.1f ms, mean %.3f ms, std %.3f ms',dActualEventTimeNanosGpsBaseSampleRate,dActualEventTimeNanosGpsBaseMin*NS2MS,dActualEventTimeNanosGpsBaseMax*NS2MS,dActualEventTimeNanosGpsBaseMean*NS2MS,dActualEventTimeNanosGpsBaseStd*NS2MS);
 log2terminal('I',TAG,logMsg);
+
+
+figure;
+timeSeriesSubPlotRows = 2;
+timeSeriesSubPlotColumns =1;
+subplot(timeSeriesSubPlotRows,timeSeriesSubPlotColumns,1);
+plot(sensorEventTime);
+xlabel('Sample') ;
+ylabel('Nanosecond');
+title('System based sample time');
+subplot(timeSeriesSubPlotRows,timeSeriesSubPlotColumns,2);
+dSensorEventTime = sensorEventTime(2:N,1) - sensorEventTime(1:(N-1),1);
+plot(dSensorEventTime);
+ax = gca;
+ax.YAxis.Exponent = 6;
+xlabel('Sample') ;
+ylabel('Nanosecond');
+title('System based sample interval');
 

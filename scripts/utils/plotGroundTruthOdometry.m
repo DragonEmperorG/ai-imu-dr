@@ -4,6 +4,17 @@ function [] = plotGroundTruthOdometry(plotFlag,folderPath)
 
 TAG = 'plotGroundTruthOdometry';
 
+plotFlag = 0;
+preprocessTime = loadPreprocessTime(folderPath);
+preprocessGroundTruthNavPosition = loadPreprocessGroundTruthNavPosition(folderPath);
+preprocessGroundTruthNavDeltaPosition = diff(preprocessGroundTruthNavPosition);
+preprocessGroundTruthNavDeltaDistance = sqrt(sum(preprocessGroundTruthNavDeltaPosition.*preprocessGroundTruthNavDeltaPosition,2));
+preprocessGroundTruthNavCumsum = cumsum(preprocessGroundTruthNavDeltaDistance);
+length = preprocessGroundTruthNavCumsum(end);
+duration = preprocessTime(end) - preprocessTime(1);
+logMsg = sprintf('length: %.3f, duration: %.3f', length, duration);
+log2terminal('I',TAG,logMsg);
+
 
 if plotFlag ~= 0
     preprocessTime = loadPreprocessTime(folderPath);
@@ -44,6 +55,17 @@ if plotFlag ~= 0
 
     set(axesObject1,'FontSize',10);
     set(axesObject2,'FontSize',10);
+
+    integerTimeIndex = [];
+    for i = 1:size(pTime,1)
+        if rem(pTime(i),1) == 0
+            integerTimeIndex = [integerTimeIndex; i];
+        end
+    end
+    set(lineObject1,'Marker','o');
+    set(lineObject1,'MarkerIndices',integerTimeIndex);
+    set(lineObject2,'Marker','o');
+    set(lineObject2,'MarkerIndices',integerTimeIndex);
 
     saveFolderPath = fullfile(folderPath,"dayZeroOClockAlign");
     saveFigFileName = "GroundTruthOdometry";

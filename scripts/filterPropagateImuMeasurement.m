@@ -92,6 +92,7 @@ updateStateMeasurementTransitionH(1:3,19:21) = updateStateJacobianC;
 useDeeplearnedMeasurement = true;
 if useDeeplearnedMeasurement
     measurementCovarianceR = diag([3,3,3]);
+    % measurementCovarianceR = diag([0.5,1,0.5]);
     measurementError = [0; inputPseudoMeasurementForwardVelocity(2); 0] - updateStateCarVelocityInCar;
 else    
     measurementIndex = [1 3];
@@ -132,6 +133,7 @@ updateState5AccelerationBias = propagateState5AccelerationBias + updateStateMeas
 
 updateStateDeltaRotationFromImuToCar = SO3.exp(updateStateMeasurementTransitionDeltaX(16:18));
 updateState6Rotation = updateStateDeltaRotationFromImuToCar * propagateState6Rotation;
+
 updateState7Transition = propagateState7Transition + updateStateMeasurementTransitionDeltaX(19:21);
 
 updateStateMeasurementTransitionIKH = eye(inputFilterPSize) - updateStateMeasurementTransitionK * updateStateMeasurementTransitionH;

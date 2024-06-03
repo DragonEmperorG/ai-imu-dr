@@ -4,7 +4,7 @@ clear;
 
 % 添加自定义工具类函数
 addpath(genpath(pwd));
-TAG = 'PreprocessorDeepOdoTrainData';
+TAG = 'PreprocessorDeepOriTrainData';
 
 % 添加时间换算常量
 S2MS = 1e3;
@@ -26,8 +26,8 @@ cDatasetCollectionDate = '2023_04_10';
 cReorganizedFolderName = 'Reorganized';
 cReorganizedFolderPath = fullfile(cDatasetFolderPath,cDatasetCollectionDate,cReorganizedFolderName);
 % TODO: S1.3: 配置数据集存储文件夹 采集轨迹编号
-cPreprocessTrackList = ["0009"];
-% cPreprocessTrackList = ["0008" "0009" "0010" "0011" "0012" "0013" "0014" "0015" "0016"];
+% cPreprocessTrackList = ["0008"];
+cPreprocessTrackList = ["0008" "0009" "0010" "0011" "0012" "0013" "0014" "0015" "0016" "0017" "0018"];
 cPreprocessTrackListLength = length(cPreprocessTrackList);
 % TODO: S1.4: 配置数据集存储文件夹 采集手机
 % cPhoneMapNumber = ["GOOGLE_Pixel3"];
@@ -48,11 +48,11 @@ cDayZeroOClockAlignFolderName = 'dayZeroOClockAlign';
 cTrackGroundTruthImuFileName = 'TrackGroundTruthImu.csv';
 cResampledSynchronizationTimeOffsetFileName = 'ResampledSynchronizationTimeOffset.txt';
 % 添加输出预处理时间同步文件
-cDatasetDeepOdoModelFolderName = 'DATASET_DEEPODO';
-cDeepOdoTrainDataFileName = 'DeepOdoTrainData.csv';
+cDatasetDeepOriModelFolderName = 'DATASET_DEEPORI';
+cDeepOriTrainDataFileName = 'DeepOriTrainData.csv';
 
 % DEBUG: 配置是否重新计算
-isRecomputeDeepOdoTrainDataFile = true;
+isRecomputeDeepOriTrainDataFile = true;
 
 for i = 1:cPreprocessTrackListLength
     tTrackFolderNameStr = cPreprocessTrackList(i);
@@ -68,14 +68,14 @@ for i = 1:cPreprocessTrackListLength
                 if isfolder(tTrackSmartPhoneFolderPath)
                     tDayZeroOClockAlignFolderPath = fullfile(tTrackSmartPhoneFolderPath,cDayZeroOClockAlignFolderName);
 
-                    cDatasetDeepOdoModelFolderPath = fullfile(tTrackSmartPhoneFolderPath,cDatasetDeepOdoModelFolderName);
+                    cDatasetDeepOdoModelFolderPath = fullfile(tTrackSmartPhoneFolderPath,cDatasetDeepOriModelFolderName);
                     if ~isfolder(cDatasetDeepOdoModelFolderPath)
                         mkdir(cDatasetDeepOdoModelFolderPath);
                     end
 
-                    cDeepOdoTrainDataFilePath = fullfile(cDatasetDeepOdoModelFolderPath,cDeepOdoTrainDataFileName);
+                    cDeepOdoTrainDataFilePath = fullfile(cDatasetDeepOdoModelFolderPath,cDeepOriTrainDataFileName);
 
-                    if ~isfile(cDeepOdoTrainDataFilePath) || isRecomputeDeepOdoTrainDataFile
+                    if ~isfile(cDeepOdoTrainDataFilePath) || isRecomputeDeepOriTrainDataFile
                         tTrackSmartPhoneSensorGyroscopeUncalibratedFilePath = fullfile(tDayZeroOClockAlignFolderPath,kMotionSensorGyroscopeUncalibratedFileNameString);
                         tTrackSmartPhoneSensorAccelerometerUncalibratedFilePath = fullfile(tDayZeroOClockAlignFolderPath,kMotionSensorAccelerometerUncalibratedFileNameString);
                         tTrackSmartPhoneSensorPressureFilePath = fullfile(tDayZeroOClockAlignFolderPath,kEnvironmentSensorPressureFileNameString);
@@ -209,42 +209,15 @@ for i = 1:cPreprocessTrackListLength
 
                         resamplePhoneTime = resampleGroundTruthTime - synchronizeTimeOffset;
 
-                        deepOdoTrainData = zeros(resampleGroundTruthTimeSize,1+6+1+1);
-                        deepOdoTrainData(:,1) = resampleGroundTruthTime;
-                        deepOdoTrainData(:,2:4) = interp1(smartPhoneImuGyroscopeData(:,2),smartPhoneImuGyroscopeData(:,4:6),resamplePhoneTime);
-                        deepOdoTrainData(:,5:7) = interp1(smartPhoneImuAccelerometerData(:,2),smartPhoneImuAccelerometerData(:,4:6),resamplePhoneTime);
-                        deepOdoTrainData(:,8) = interp1(smartPhonePressureData(:,2),smartPhonePressureData(:,4),resamplePhoneTime);
-                        interpGroundTruthVelocityInCarCoordinateData = interpolateSpanVelocityInCarCoordinateData(tTrackGroundTruthNavData,deepOdoTrainData(:,1));
-                        deepOdoTrainData(:,9) = interpGroundTruthVelocityInCarCoordinateData(:,2);
+                        deepOriTrainData = zeros(resampleGroundTruthTimeSize,1+6+9);
+                        deepOriTrainData(:,1) = resampleGroundTruthTime;
+                        deepOriTrainData(:,2:4) = interp1(smartPhoneImuGyroscopeData(:,2),smartPhoneImuGyroscopeData(:,4:6),resamplePhoneTime);
+                        deepOriTrainData(:,5:7) = interp1(smartPhoneImuAccelerometerData(:,2),smartPhoneImuAccelerometerData(:,4:6),resamplePhoneTime);
+                        
+                        interpGroundTruthData = interpolateSpanRawData(tTrackGroundTruthNavData,deepOriTrainData(:,1));
+                        deepOriTrainData(:,8:16) = interpGroundTruthData(:,1:9);
 
-                        tTrackGroundTruthImuFilePath = fullfile(tDayZeroOClockAlignFolderPath,cTrackGroundTruthImuFileName);
-                        groundTruthImuRawData = readmatrix(tTrackGroundTruthImuFilePath);
-                        groundTruthImuData = groundTruthImuRawData;
-                        groundTruthImuDataTabulate = tabulate(groundTruthImuRawData(:,1));
-                        groundTruthImuDataTabulateSorted = sortrows(groundTruthImuDataTabulate,2,'descend');
-                        if groundTruthImuDataTabulateSorted(1,2) >= 2
-                            duplicateData = groundTruthImuDataTabulateSorted(groundTruthImuDataTabulateSorted(:,2)>=2,:);
-                            duplicateDataSize = size(duplicateData,1);
-
-                            logMsg = sprintf('Duplicate ground truth IMU data count %d',duplicateDataSize);
-                            log2terminal('E',TAG,logMsg);
-
-                            for duplicateDataCounter = 1:duplicateDataSize
-                                tDuplicateData = duplicateData(duplicateDataCounter,:);
-                                logMsg = sprintf('Duplicate ground truth IMU data timestamp %.3f s, count %d',tDuplicateData(1),tDuplicateData(2));
-                                log2terminal('E',TAG,logMsg);
-                                
-                                if duplicateDataCounter > 3
-                                    break;
-                                end
-
-                            end
-                            groundTruthImuData = unique(groundTruthImuRawData,'rows');
-                        end
-                        interpolatedGroundTruthImuData = interp1(groundTruthImuData(:,1),groundTruthImuData(:,2:7),deepOdoTrainData(:,1));
-                        plotDeepOdoTrainData(1,deepOdoTrainData(:,1),interpolatedGroundTruthImuData,deepOdoTrainData);
-
-                        writematrix(deepOdoTrainData,cDeepOdoTrainDataFilePath);
+                        writematrix(deepOriTrainData,cDeepOdoTrainDataFilePath);
                     end
 
                     % logMsg = sprintf('D');

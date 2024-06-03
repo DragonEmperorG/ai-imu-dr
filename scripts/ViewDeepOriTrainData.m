@@ -1,6 +1,6 @@
 % 重置工作区环境
 clearvars;
-% close all;
+close all;
 dbstop error;
 % clc;
 
@@ -42,8 +42,8 @@ cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameLi
 
 
 % TODO: S2.1: 配置调试模式
-cDebug = true;
-% cDebug = false;
+% cDebug = true;
+cDebug = false;
 
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);
@@ -55,12 +55,8 @@ else
         logTrackNumerator = i;
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
 
-        % if i <= 2
-        %     continue;
-        % end
-
         if cDebug
-            if ~strcmp(tDatasetLevel4TrackFolderName,"0009")
+            if ~strcmp(tDatasetLevel4TrackFolderName,"0008")
                 continue;
             end
         end
@@ -85,8 +81,7 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    % processIntegratedGroundTruth(tDatasetLevel5FolderPhonePath);
-                    processDataModelDrivenMethod(tDatasetLevel5FolderPhonePath);
+                    plotDeepOriTrainData(1,tDatasetLevel5FolderPhonePath)
 
                 end
             end

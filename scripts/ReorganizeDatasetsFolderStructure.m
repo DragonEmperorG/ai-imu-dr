@@ -6,7 +6,7 @@ TAG = 'ReorganizeDatasetsFolderStructure';
 
 % cDatasetFolderPath = 'C:\DoctorRelated\20230410重庆VDR数据采集\2023_04_15';
 cProjectDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集';
-cDatasetCollectionDate = '2023_04_10';
+cDatasetCollectionDate = '2023_04_11';
 cDatasetCollectionFolderPath = fullfile(cProjectDatasetFolderPath,cDatasetCollectionDate);
 cSmartPhoneFolderNameList = ["HUAWEI_Mate30" "HUAWEI_P20" "GOOGLE_Pixel3"];
 cSmartPhoneFolderNameListLength = length(cSmartPhoneFolderNameList);

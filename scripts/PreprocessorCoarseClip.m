@@ -20,38 +20,45 @@ NS2US = 1/US2NS;
 % cDatasetFolderPath = 'C:\DoctorRelated\20230410重庆VDR数据采集';
 cDatasetFolderPath = 'E:\DoctorRelated\20230410重庆VDR数据采集';
 % TODO: S1.2: 配置数据集存储文件夹 采集日期
-% cDatasetCollectionDate = '2023_04_10';
+cDatasetCollectionDate = '2023_04_10';
+% cDatasetCollectionDate = '2023_04_11';
 % cDatasetCollectionDate = '2023_04_13';
-cDatasetCollectionDate = '2023_04_15'
+% cDatasetCollectionDate = '2023_04_15'
 % 添加预处理粗分割文件夹路径
 cReorganizedFolderName = 'Reorganized';
 cReorganizedFolderPath = fullfile(cDatasetFolderPath,cDatasetCollectionDate,cReorganizedFolderName);
 % TODO: S1.3: 配置数据集存储文件夹 采集轨迹编号
-% cPreprocessTrackList = ["0001" "0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009" "0010" "0011" "0012" "0013" "0014" "0015" "0016" "0017" "0018" "0019" "0020" "0021" "0022" "0023"];
-cPreprocessTrackList = ["0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009"];
+% cPreprocessTrackList = ["0001" "0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009" "0010" "0011" "0012" "0013" "0014" "0015" "0016" "0017" "0018" "0019" "0020" "0021" "0022" "0023" "0024"];
+cPreprocessTrackList = ["0008" "0009" "0010" "0011" "0012" "0013" "0014" "0015" "0016" "0017" "0018"];
 cPreprocessTrackListLength = length(cPreprocessTrackList);
 % TODO: S1.4: 配置数据集存储文件夹 采集手机
 % cPhoneMapNumber = ["GOOGLE_Pixel3"];
-% cPhoneMapNumber = ["HUAWEI_Mate30"];
+cPhoneMapNumber = ["HUAWEI_Mate30"];
 % cPhoneMapNumber = ["HUAWEI_P20"];
 % cPhoneMapNumber = ["GOOGLE_Pixel3" "HUAWEI_Mate30"];
-cPhoneMapNumber = ["GOOGLE_Pixel3" "HUAWEI_Mate30" "HUAWEI_P20"];
+% cPhoneMapNumber = ["GOOGLE_Pixel3" "HUAWEI_Mate30" "HUAWEI_P20"];
 kPhoneMapNumberLength = length(cPhoneMapNumber);
 
 % TODO: S2.1: 配置导航坐标系参考真值文件路径
 % Load Novatel SPAN data
 cGpsWeek = 2257;
-% cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_10\重大数据\SPAN\IMU位置车体姿态\3-车体坐标系-IMU位置-gps.csv';
+cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_10\重大数据\SPAN\IMU位置车体姿态\3-车体坐标系-IMU位置-gps.csv';
+% cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_11\参考真值\第一组\SPAN\车体姿态IMU位置\1-车体坐标系-IMU位置-200HZ-gps.csv';
+% cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_11\参考真值\第二组\车体姿态IMU位置\车体坐标系-IMU坐标-gps.csv';
 % cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_13\20230413\上午数据\SPAN\车体姿态IMU位置\车体姿态-IMU位置-200HZ-gps.csv';
+% cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_13\20230413\下午数据\大宝山公墓\SPAN\车体姿态IMU位置\车体姿态-IMU位置-200HZ-gps.csv';
 % cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_13\20230413\下午数据\中绿江州\SPAN\IMU位置车体姿态\IMU位置-车体姿态-200Hz-gps.csv';
-cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_15\20230415\SPAN\车体姿态IMU位置\车体姿态-IMU位置-gps.csv';
+% cReferenceNovatelSpanDataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_15\20230415\SPAN\车体姿态IMU位置\车体姿态-IMU位置-gps.csv';
 novatelSpanData = loadSpanPostDataWithZeroOClockTime(cReferenceNovatelSpanDataFilePath,cGpsWeek,cDatasetCollectionDate);
 % TODO: S2.2: 配置时间同步参考IMU文件路径
 % Load JZ-MINS200 data
-% cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_10\重大数据\九州数据\九洲设备-COM4-2023_4_10_14-17-17-imu.csv';
+cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_10\重大数据\九州数据\九洲设备-COM4-2023_4_10_14-17-17-imu.csv';
+% cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_11\参考真值\第一组\九州数据\下午第一次IMU数据-COM6-2023_4_11_14-33-19-imu.csv';
+% cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_13\20230413\下午数据\大宝山公墓\九洲原始数据\九洲设备-imu.csv';
+% cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_11\参考真值\第二组\九州数据\IMU数据-COM7-2023_4_11_16-37-21-imu.csv';
 % cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_13\20230413\上午数据\九洲数据\九洲设备-imu.csv';
 % cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_13\20230413\下午数据\中绿江州\九洲原始数据\九洲设备-imu.csv';
-cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_15\20230415\九州数据\ReceivedTofile-COM4-2023_4_15_14-30-20-imu.csv';
+% cReferenceJZMINS200DataFilePath = 'E:\DoctorRelated\20230410重庆VDR数据采集\2023_04_15\20230415\九州数据\ReceivedTofile-COM4-2023_4_15_14-30-20-imu.csv';
 jZMINS200Data = loadJzMins200DataWithZeroOClockTime(cReferenceJZMINS200DataFilePath,cGpsWeek,cDatasetCollectionDate);
 
 % 添加输入原始数据集存储文件夹
@@ -61,7 +68,7 @@ load 'SmartPhoneDataConfig.mat';
 cDayZeroOClockAlignFolderName = 'dayZeroOClockAlign';
 
 % TODO: S3.1: 配置是否替换有问题的GNSS时间基准
-isReplaceGpsTimeBase = false;
+isReplaceGpsTimeBase = true;
 
 % DEBUG: 配置是否重新计算
 isRecomputeGroundTruthFile = true;
