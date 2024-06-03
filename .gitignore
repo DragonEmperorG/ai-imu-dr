@@ -6,4 +6,6 @@ temp/normalize_factors.p
 temp/*.p
 src/__pycache__
 
+*.asv
+
 kitti/
