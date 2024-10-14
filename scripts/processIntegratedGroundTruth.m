@@ -54,7 +54,7 @@ for i = 2:filterTimeLength
     imuMeasurement{1,2} = tMeasurementImuGyroscope;
     imuMeasurement{1,3} = tMeasurementImuAccelerometer;
     imuMeasurement{1,4} = tMeasurementNavOrientation' * tMeasurementNavVelocity';
-    tFilterStateCell = filterPropagateImuMeasurement(tFilterStateCell,imuMeasurement);
+    tFilterStateCell = filterPropagateUpdate2DNHCImuMeasurement(tFilterStateCell,imuMeasurement);
 
     orientationMeasurement = cell(1,2);
     orientationMeasurement{1,1} = tMeasurementNavOrientation;
@@ -87,4 +87,5 @@ for i = 2:filterTimeLength
 
 end
 
-saveFilterStateIntegratedGroundTruth(folderPath,saveFilterState);
+% saveFilterStateIntegratedGroundTruth(folderPath,saveFilterState);
+saveFilterStateIntegratedCombinationDataDriven(folderPath,'IntegratedGTDataDriven.mat',saveFilterState);

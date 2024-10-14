@@ -7,42 +7,67 @@ TAG = 'processIntegratedGroundTruth';
 % 加载数据
 preprocessRawFlatData = loadPreprocessRawFlat(folderPath);
 dataDrivenMeasurementOrientationRaw = loadDataDrivenMeasurementOrientationRaw(folderPath);
+dataDrivenMeasurementVelocityRaw = loadDataDrivenVelocityMeasurement(folderPath);
 
 % 解析数据
+
+dataDrivenTime = dataDrivenMeasurementOrientationRaw(:,1);
+
 filterTimeLength = size(preprocessRawFlatData,1);
 preprocessTime = getPreprocessTime(preprocessRawFlatData);
+
+[~, referenceOrientationTimeIndex] = getTrackBeginIntegerSecondTime(preprocessTime);
+
+trackEndIntegerSecondTime = floor(preprocessTime(end));
+trackEndIntegerSecondTimeIndex = find(preprocessTime == trackEndIntegerSecondTime);
+trackIntegerSecondTimeIndex = referenceOrientationTimeIndex:200:trackEndIntegerSecondTimeIndex;
+
+dataDrivenEndIntegerSecondTimeIndex = find(dataDrivenTime == trackEndIntegerSecondTime);
+dataDrivenMeasurementOrientationRaw = dataDrivenMeasurementOrientationRaw(1:dataDrivenEndIntegerSecondTimeIndex,:);
+dataDrivenMeasurementVelocityRaw = dataDrivenMeasurementVelocityRaw(1:dataDrivenEndIntegerSecondTimeIndex,:);
+dataDrivenTime = dataDrivenMeasurementOrientationRaw(:,1);
+
 preprocessPhoneImuGyroscope = getPreprocessPhoneImuGyroscope(preprocessRawFlatData);
 preprocessPhoneImuAccelerometer = getPreprocessPhoneImuAccelerometer(preprocessRawFlatData);
 preprocessGroundTruthNavOrientation = getPreprocessGroundTruthNavOrientationRotationMatrix(preprocessRawFlatData);
 preprocessGroundTruthNavVelocity = getPreprocessGroundTruthNavVelocity(preprocessRawFlatData);
 preprocessGroundTruthNavPosition = getPreprocessGroundTruthNavPosition(preprocessRawFlatData);
 
-dataDrivenTime = dataDrivenMeasurementOrientationRaw(:,1);
-[~, referenceOrientationTimeIndex] = getTrackBeginIntegerSecondTime(preprocessTime);
-dataDrivenNavOrientation = getDataDrivenMeasurementOrientationRotationMatrix(preprocessGroundTruthNavOrientation(:,:,referenceOrientationTimeIndex),dataDrivenMeasurementOrientationRaw);
+% dataDrivenNavOrientation = getDataDrivenMeasurementOrientationRotationMatrix(preprocessGroundTruthNavOrientation(:,:,referenceOrientationTimeIndex),dataDrivenMeasurementOrientationRaw);
+
+dataDrivenNavOrientation = loadDataDrivenAttitudeMeasurement(folderPath,0);
+dataDrivenNavOrientation = dataDrivenNavOrientation(:,:,1:dataDrivenEndIntegerSecondTimeIndex);
 
 
-[PreprocessGroundTruthNavOrientationEulerAnglePitch,PreprocessGroundTruthNavOrientationEulerAngleRoll,PreprocessGroundTruthNavOrientationEulerAngleYaw] = dcm2angle(dataDrivenNavOrientation,'XYZ');
-preprocessGroundTruthNavOrientationEulerAngleDeg = rad2deg(horzcat(PreprocessGroundTruthNavOrientationEulerAnglePitch,PreprocessGroundTruthNavOrientationEulerAngleRoll,PreprocessGroundTruthNavOrientationEulerAngleYaw));
-figure;
-plot(preprocessGroundTruthNavOrientationEulerAngleDeg);
+% [dataDrivenNavOrientationEulerAnglePitch,dataDrivenNavOrientationEulerAngleRoll,dataDrivenNavOrientationEulerAngleYaw] = dcm2angle(dataDrivenNavOrientation,'XYZ');
+% dataDrivenNavOrientationEulerAngleDeg = rad2deg(horzcat(dataDrivenNavOrientationEulerAnglePitch,dataDrivenNavOrientationEulerAngleRoll,dataDrivenNavOrientationEulerAngleYaw));
+dataDrivenNavOrientationEulerAngle = rotm2eul(dataDrivenNavOrientation,'XYZ');
+dataDrivenNavOrientationEulerAngleDeg = rad2deg(dataDrivenNavOrientationEulerAngle);
+
+dataDrivenCarVelocity = interp1(dataDrivenTime,dataDrivenMeasurementVelocityRaw,preprocessTime,'linear','extrap');
+
+
+% figure;
+% hold on;
+% plot(dataDrivenNavOrientationEulerAngleDeg(:,1),'-r');
+% plot(dataDrivenNavOrientationEulerAngleDeg(:,2),'-g');
+% plot(dataDrivenNavOrientationEulerAngleDeg(:,3),'-b');
 % 
 % 
-trackEndIntegerSecondTime = floor(preprocessTime(end));
-trackBeginIntegerSecondTimeIndex = find(preprocessTime == trackEndIntegerSecondTime);
-trackIntegerSecondTimeIndex = referenceOrientationTimeIndex:200:trackBeginIntegerSecondTimeIndex;
-[PreprocessGroundTruthNavOrientationEulerAnglePitch,PreprocessGroundTruthNavOrientationEulerAngleRoll,PreprocessGroundTruthNavOrientationEulerAngleYaw] = dcm2angle(preprocessGroundTruthNavOrientation(:,:,trackIntegerSecondTimeIndex),'XYZ');
-preprocessGroundTruthNavOrientationEulerAngleDeg1 = rad2deg(horzcat(PreprocessGroundTruthNavOrientationEulerAnglePitch,PreprocessGroundTruthNavOrientationEulerAngleRoll,PreprocessGroundTruthNavOrientationEulerAngleYaw));
-hold on;
-plot(preprocessGroundTruthNavOrientationEulerAngleDeg1);
 
-% preprocessGroundTruthNavOrientationEulerAngleDeg(:,1:2) = preprocessGroundTruthNavOrientationEulerAngleDeg1(:,1:2);
-preprocessGroundTruthNavOrientationEulerAngleRad = deg2rad(preprocessGroundTruthNavOrientationEulerAngleDeg1);
-dataDrivenNavOrientation = angle2dcm( ...
-    preprocessGroundTruthNavOrientationEulerAngleRad(:,1), ...
-    preprocessGroundTruthNavOrientationEulerAngleRad(:,2), ...
-    preprocessGroundTruthNavOrientationEulerAngleRad(:,3), ...
-    'XYZ');
+% [PreprocessGroundTruthNavOrientationEulerAnglePitch,PreprocessGroundTruthNavOrientationEulerAngleRoll,PreprocessGroundTruthNavOrientationEulerAngleYaw] = dcm2angle(preprocessGroundTruthNavOrientation(:,:,trackIntegerSecondTimeIndex),'XYZ');
+% preprocessGroundTruthNavOrientationEulerAngleDeg1 = rad2deg(horzcat(PreprocessGroundTruthNavOrientationEulerAnglePitch,PreprocessGroundTruthNavOrientationEulerAngleRoll,PreprocessGroundTruthNavOrientationEulerAngleYaw));
+
+preprocessGroundTruthNavOrientationEulerAngle = rotm2eul(preprocessGroundTruthNavOrientation(:,:,trackIntegerSecondTimeIndex),'XYZ');
+preprocessGroundTruthNavOrientationEulerAngleDeg1 = rad2deg(preprocessGroundTruthNavOrientationEulerAngle);
+
+% plot(preprocessGroundTruthNavOrientationEulerAngleDeg1(:,1),'--r');
+% plot(preprocessGroundTruthNavOrientationEulerAngleDeg1(:,2),'--g');
+% plot(preprocessGroundTruthNavOrientationEulerAngleDeg1(:,3),'--b');
+
+dataDrivenNavOrientationEulerAngleDeg(:,1:2) = preprocessGroundTruthNavOrientationEulerAngleDeg1(:,1:2);
+preprocessGroundTruthNavOrientationEulerAngleRad = deg2rad(dataDrivenNavOrientationEulerAngleDeg);
+dataDrivenNavOrientation = eul2rotm(preprocessGroundTruthNavOrientationEulerAngleRad,'XYZ');
 
 
 tFilterStateCell = filterInitialization(folderPath);
@@ -83,8 +108,10 @@ for i = 2:filterTimeLength
     imuMeasurement{1,1} = tDeltaTime;
     imuMeasurement{1,2} = tMeasurementImuGyroscope;
     imuMeasurement{1,3} = tMeasurementImuAccelerometer;
-    imuMeasurement{1,4} = tMeasurementNavOrientation' * tMeasurementNavVelocity';
-    tFilterStateCell = filterPropagateImuMeasurement(tFilterStateCell,imuMeasurement);
+    % imuMeasurement{1,4} = tMeasurementNavOrientation' * tMeasurementNavVelocity';
+    imuMeasurement{1,4} = [0 dataDrivenCarVelocity(i) 0];
+    tFilterStateCell = filterPropagateUpdate2DNHCImuMeasurement(tFilterStateCell,imuMeasurement);
+    % tFilterStateCell = filterPropagateUpdate3DNHCImuMeasurement(tFilterStateCell,imuMeasurement);
 
     if find(dataDrivenTime == tFilterTime)
         orientationMeasurement = cell(1,2);
@@ -93,7 +120,8 @@ for i = 2:filterTimeLength
         % orientationMeasurement{1,2} = diag([1e-3 1e-3 1e-3]).^2;
 
         orientationMeasurement{1,1} = dataDrivenNavOrientation(:,:,dataDrivenTime == tFilterTime);
-        orientationMeasurement{1,2} = diag([1e-2 1e-2 1e-2]).^2;
+        orientationMeasurement{1,2} = diag([1e-3 1e-3 1e-3]).^2;
+        % orientationMeasurement{1,2} = diag([1e-1 1e-1 1e-1]).^2;
         tFilterStateCell = filterUpdateOrientationMeasurement(tFilterStateCell,orientationMeasurement);
     end
 
@@ -109,4 +137,8 @@ for i = 2:filterTimeLength
 
 end
 
-saveFilterStateIntegratedDataDriven(folderPath,saveFilterState);
+% saveFilterStateIntegratedCombinationDataDriven(folderPath,'Integrated2DNHCDataDriven.mat',saveFilterState);
+% saveFilterStateIntegratedCombinationDataDriven(folderPath,'Integrated3DNHCDataDriven.mat',saveFilterState);
+saveFilterStateIntegratedCombinationDataDriven(folderPath,'Integrated2DNHCATTDataDriven.mat',saveFilterState);
+% saveFilterStateIntegratedDataDriven(folderPath,saveFilterState);
+% saveFilterStateIntegratedCombinationDataDriven(folderPath,'IntegratedGTDataDriven.mat',saveFilterState);

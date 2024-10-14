@@ -1,4 +1,4 @@
-function [outputFilterState] = filterPropagateImuMeasurement(inputFilterState,inputImuMeasurement)
+function [outputFilterState] = filterPropagateUpdate2DNHCImuMeasurement(inputFilterState,inputImuMeasurement)
 %UNTITLED 此处显示有关此函数的摘要
 %   此处显示详细说明
 
@@ -21,7 +21,8 @@ dt = inputImuMeasurement{1,1};
 dtdt = dt * dt;
 inputImuMeasurementAngulerSpeed = (inputImuMeasurement{1,2})';
 inputImuMeasurementAcceleration = (inputImuMeasurement{1,3})';
-inputPseudoMeasurementForwardVelocity = inputImuMeasurement{1,4};
+
+% inputPseudoMeasurementForwardVelocity = inputImuMeasurement{1,4};
 
 %%% Propagate
 propagateState1AngulerSpeed = inputImuMeasurementAngulerSpeed - inputFilterState4AngulerSpeedBias;
@@ -87,20 +88,10 @@ updateStateMeasurementTransitionH(1:3,10:12) = updateStateJacobianA;
 updateStateMeasurementTransitionH(1:3,16:18) = updateStateJacobianB;
 updateStateMeasurementTransitionH(1:3,19:21) = updateStateJacobianC;
 
-
-
-useDeeplearnedMeasurement = true;
-if useDeeplearnedMeasurement
-    measurementCovarianceR = diag([3,3,3]);
-    % measurementCovarianceR = diag([0.5,1,0.5]);
-    measurementError = [0; inputPseudoMeasurementForwardVelocity(2); 0] - updateStateCarVelocityInCar;
-else    
-    measurementIndex = [1 3];
-    updateStateMeasurementTransitionH = updateStateMeasurementTransitionH(measurementIndex,:);
-    % measurementCovarianceR = diag([15,8]);
-    measurementCovarianceR = diag([3,3]);
-    measurementError = - updateStateCarVelocityInCar;
-end
+measurementIndex = [1 3];
+updateStateMeasurementTransitionH = updateStateMeasurementTransitionH(measurementIndex,:);
+measurementCovarianceR = diag([1,3]);
+measurementError = - updateStateCarVelocityInCar([1 3]);
 
 updateStateMeasurementTransitionS = updateStateMeasurementTransitionH * propagateStateCovariance * updateStateMeasurementTransitionH' + measurementCovarianceR;
 updateStateMeasurementTransitionK = (linsolve(updateStateMeasurementTransitionS,(propagateStateCovariance * updateStateMeasurementTransitionH')'))';
