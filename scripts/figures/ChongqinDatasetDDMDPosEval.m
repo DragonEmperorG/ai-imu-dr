@@ -1,5 +1,5 @@
 % 重置工作区环境
-clearvars;
+% clearvars;
 close all;
 dbstop error;
 % clc;
@@ -40,11 +40,27 @@ cDatasetLevel4TrackFolderNameList = [...
     ];
 cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameList);
 
+% 
+cMethod1FileName = "Integrated2DNHCDataDriven.mat";
+cMethod2FileName = "Integrated3DNHCDataDriven.mat";
+cMethod3FileName = "Integrated2DNHCATTDataDriven.mat";
+cMethod4FileName = "IntegratedDataDriven.mat";
+cComparedResultList = [
+    cMethod1FileName, ...
+    cMethod2FileName, ...
+    cMethod3FileName, ...
+    cMethod4FileName, ...
+];
 
 % TODO: S2.1: 配置调试模式
-cDebug = true;
-% cDebug = false;
+% cDebug = true;
+cDebug = false;
 
+cExportFileName = "DDMDPositionEvaluationTable.txt";
+tExportFilePath = fullfile(cDatasetLevel3ReorganizedFolderPath,cExportFileName);
+exportLatexTable(tExportFilePath,datasetPE);
+
+datasetPE = [];
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);
     log2terminal('E',TAG,logMsg);
@@ -81,17 +97,27 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    plotFilterState(tDatasetLevel5FolderPhonePath);
+                    tGroundTruthNavSE = loadPreprocessGroundTruthNavSE(tDatasetLevel5FolderPhonePath);
+                    tGroundTruthNavSEDownSampled = tGroundTruthNavSE(:,:,1:200:size(tGroundTruthNavSE,3));
 
-                    % plotComparedTrackPositionCustomDataDriven(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
+                    tRelativeErrorSet = loadChongqinRelativeErrorOdometry(tDatasetLevel5FolderPhonePath);
+                    trackVE = [];
+                    for k = 1:length(cComparedResultList)
+                        tDDMDFilterResultRaw = loadFilterStateIntegratedCustomDataDriven(tDatasetLevel5FolderPhonePath,cComparedResultList(k));
+                        tDDMDFilterNavSE = getFilterStateNavSE(tDDMDFilterResultRaw);
+                        tDDMDFilterNavSEDownSampled = tDDMDFilterNavSE(:,:,1:200:size(tDDMDFilterNavSE,3));
 
-                    % plotComparedTrackPositionMultipleDataDriven(tDatasetLevel5FolderPhonePath);
+                        [APE1,APE2] = evaluateAPE(tGroundTruthNavSEDownSampled,tDDMDFilterNavSEDownSampled);
+                        [RPE1,RPE2,RPE3,RPE4,RPE5,RPE6,RPE7,RPE8] = evaluateRPEDeltaDist(tGroundTruthNavSEDownSampled,tDDMDFilterNavSEDownSampled,tRelativeErrorSet);
+                        trackVE = [trackVE,APE1,APE2,RPE3,RPE4,RPE1,RPE2,RPE7,RPE8,RPE5,RPE6];
+                        logMsg = sprintf('%s, APE MAE: %.3f, APE RMSE: %.3f; RPE MAE: %.3f, RPE RMSE: %.3f', ...
+                            cComparedResultList(k),APE1,APE2,RPE1,RPE2);
+                        log2terminal('I',TAG,logMsg);
+                    end
+                    datasetPE = [datasetPE;trackVE];
 
-                    % plotStateTrajectory(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
-
-                    % plotDeepOriTestData(1,tDatasetLevel5FolderPhonePath);
-
-                    % plotDeepOdoTestData(1,tDatasetLevel5FolderPhonePath);
+                    % velocityLabel = repmat({seqString},size(velocityError,1),1);
+                    % boxplotg = [boxplotg;velocityLabel];
 
                 end
             end
@@ -100,8 +126,3 @@ else
     end
     % Tail iterate drive_id
 end
-
-
-
-
-

@@ -81,7 +81,10 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    evaluateTrajetory(tDatasetLevel5FolderPhonePath);
+                    % evaluateTrajetory(tDatasetLevel5FolderPhonePath,'Integrated2DNHCDataDriven.mat');
+                    % evaluateTrajetory(tDatasetLevel5FolderPhonePath,'Integrated3DNHCDataDriven.mat');
+                    evaluateTrajetory(tDatasetLevel5FolderPhonePath,'Integrated2DNHCATTDataDriven.mat');
+                    % evaluateTrajetory(tDatasetLevel5FolderPhonePath,'IntegratedGTDataDriven.mat');
 
                 end
             end

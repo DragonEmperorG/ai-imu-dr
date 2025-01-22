@@ -94,7 +94,8 @@ cCarCoordinateType = 'RFU';
 
 % TODO: S2.1: 自动加载基于深度学习的自适应参数
 cDeepLearnedCovarianceAvailable = false;
-cDeepLearnedCovarianceUse = true;
+% cDeepLearnedCovarianceUse = true;
+cDeepLearnedCovarianceUse = false;
 cDeepLearnedCovarianceTxtFileName = 'DeepLearnedCovariance.txt';
 cDeepLearnedCovarianceFilePath = fullfile(cTrainDatasetFolderPath,cDeepLearnedCovarianceTxtFileName);
 if isfile(cDeepLearnedCovarianceFilePath)
@@ -116,9 +117,11 @@ end
 
 
 % cOxtslitePoseMatFilePath = 'E:\GitHubRepositories\KITTI\raw_data\2011_09_30\2011_09_30_drive_0027_extract\oxts\pose.mat';
-% load(cOxtslitePoseMatFilePath);
-% spanResampledData = tOxtslitePose;
-% cCarCoordinateType = 'FRU';
+% cOxtslitePoseMatFilePath = 'E:\GitHubRepositories\KITTI\raw_data\2011_10_03\2011_10_03_drive_0027_extract\oxts\pose.mat';  % 00 
+cOxtslitePoseMatFilePath = 'E:\GitHubRepositories\KITTI\raw_data\2011_10_03\2011_10_03_drive_0042_extract\oxts\pose.mat'; % 01 
+load(cOxtslitePoseMatFilePath);
+spanResampledData = tOxtslitePose;
+cCarCoordinateType = 'FLU';
 
 spanResampledRawDataSize = size(spanResampledRawData,1);
 
@@ -134,7 +137,7 @@ spanResampledRawDataSize = size(spanResampledRawData,1);
 % tailBiasEstimation = mean(measurement(tailBiasEstimationIndex,:),1);
 % headtailBiasEstimation = vertcat(headBiasEstimation,tailBiasEstimation);
 
-spanResampledData = spanResampledRawData(1:spanResampledRawDataSize,:);
+% spanResampledData = spanResampledRawData(1:spanResampledRawDataSize,:);
 % spanResampledData = spanResampledRawData(1:12000,:);
 % spanResampledData = spanResampledRawData(10000:12000,:);
 
@@ -402,8 +405,8 @@ for i =2:spanResampledDataSize
     propagateState1RotationEstimation = propagateState1RotationEstimation1;
     % propagateState1RotationEstimation = propagateState1RotationEstimation2;
 
-    [nPropagateRotationAng1, nPropagateRotationAng2, nPropagateRotationAng3] = dcm2angle(propagateState1RotationEstimation1,'ZXY');
-    nPropagateRotationAng = rad2deg([nPropagateRotationAng1, nPropagateRotationAng2, nPropagateRotationAng3]);
+    % [nPropagateRotationAng1, nPropagateRotationAng2, nPropagateRotationAng3] = dcm2angle(propagateState1RotationEstimation1,'ZXY');
+    % nPropagateRotationAng = rad2deg([nPropagateRotationAng1, nPropagateRotationAng2, nPropagateRotationAng3]);
     % State X2
     propagateState1Gamma1Phi = uppercaseGreekLetterGammaSubscript1(propagateState1Phi);
     propagateState2AccelerationEstimation = observationAcceleration - filterState5AccelerationBias;

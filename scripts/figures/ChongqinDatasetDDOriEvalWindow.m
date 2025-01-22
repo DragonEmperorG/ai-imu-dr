@@ -1,5 +1,5 @@
 % 重置工作区环境
-clearvars;
+% clearvars;
 close all;
 dbstop error;
 % clc;
@@ -40,11 +40,24 @@ cDatasetLevel4TrackFolderNameList = [...
     ];
 cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameList);
 
+% 基于DeepOdo模型对比输入标准化和输出归一化的效果
+cModelDeepOdoLossDeltaOrientationWindow1FileName = "DeepOriPredictedData.txt";
+cModelDeepOdoLossDeltaOrientationWindow2FileName = "LossDeltaOrientationWindow2.txt";
+
+cComparedResultList = [
+    cModelDeepOdoLossDeltaOrientationWindow1FileName,
+    cModelDeepOdoLossDeltaOrientationWindow2FileName
+];
 
 % TODO: S2.1: 配置调试模式
-cDebug = true;
-% cDebug = false;
+% cDebug = true;
+cDebug = false;
 
+% cExportFileName = "DataDrivenOrientationMeasurementWindowSizeFactorTable.txt";
+% tExportFilePath = fullfile(cDatasetLevel3ReorganizedFolderPath,cExportFileName);
+% exportLatexTable(tExportFilePath,datasetOE);
+
+datasetOE = [];
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);
     log2terminal('E',TAG,logMsg);
@@ -81,17 +94,29 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    plotFilterState(tDatasetLevel5FolderPhonePath);
+                    groundTruthOrientation = loadDataDrivenAttitudeGroundTruth(tDatasetLevel5FolderPhonePath);
+                    trackVE = [];
+                    for k = 1:length(cComparedResultList)
+                        tDataDrivenOrientationFilePath = fullfile(tDatasetLevel5FolderPhonePath,'DATASET_DEEPORI',cComparedResultList(k));
+                        tDataDrivenOrientationRaw = readmatrix(tDataDrivenOrientationFilePath);
+                        tDataDrivenOrientation = [];
+                        if size(tDataDrivenOrientationRaw,2) == 4
+                            tDataDrivenOrientation = loadDataDrivenAttitudeMeasurement(tDatasetLevel5FolderPhonePath, 0);
+                        else
+                            tDataDrivenOrientation = convertOrientationFlatToRotationMatrix(tDataDrivenOrientationRaw(:,2:end));
+                        end
 
-                    % plotComparedTrackPositionCustomDataDriven(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
+                        [AOE1,AOE2] = evaluateAOE(groundTruthOrientation,tDataDrivenOrientation);
+                        [ROE1,ROE2] = evaluateROE(groundTruthOrientation,tDataDrivenOrientation);
+                        trackVE = [trackVE,AOE1,AOE2,ROE1,ROE2];
+                        logMsg = sprintf('%s, AOE MAE: %.3f, AOE RMSE: %.3f; ROE MAE: %.3f, ROE RMSE: %.3f', ...
+                            cComparedResultList(k),AOE1,AOE2,ROE1,ROE2);
+                        log2terminal('I',TAG,logMsg);
+                    end
+                    datasetOE = [datasetOE;trackVE];
 
-                    % plotComparedTrackPositionMultipleDataDriven(tDatasetLevel5FolderPhonePath);
-
-                    % plotStateTrajectory(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
-
-                    % plotDeepOriTestData(1,tDatasetLevel5FolderPhonePath);
-
-                    % plotDeepOdoTestData(1,tDatasetLevel5FolderPhonePath);
+                    % velocityLabel = repmat({seqString},size(velocityError,1),1);
+                    % boxplotg = [boxplotg;velocityLabel];
 
                 end
             end
@@ -100,8 +125,3 @@ else
     end
     % Tail iterate drive_id
 end
-
-
-
-
-

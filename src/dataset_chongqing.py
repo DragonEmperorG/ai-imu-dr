@@ -84,13 +84,22 @@ class CustomChongQingDataset:
 
         custom_parse_data = custom_raw_data.copy(deep=True)
 
+        custom_parse_data = custom_parse_data.iloc[7186:24801, :]
+
         custom_dataset_timestamp = custom_parse_data[CustomChongQingDataset._DATA_TIMESTAMP].to_numpy()
         custom_dataset_timestamp_size = custom_dataset_timestamp.shape[0]
         aiimudr_dataset_reference_timestamp = custom_dataset_timestamp[0]
         aiimudr_dataset_timestamp = custom_dataset_timestamp - aiimudr_dataset_reference_timestamp
 
         # aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}_extract".format("2023_04_10", 8, "huawei_mate30")
-        aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}_extract".format("2023_04_10", 8, "google_pixel3")
+        aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}_piecewise_{}_{}_extract".format("2023_04_10", 8, "huawei_mate30", 11187, custom_dataset_timestamp_size)
+        # aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}_piecewise_{}_{}_extract".format("2023_04_10", 8, "huawei_mate30", 11187, 15187)
+        # aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}_integral_{}_{}_extract".format("2023_04_10", 9, "huawei_mate30", 1, custom_dataset_timestamp_size)
+        # aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}_integral_{}_{}_extract".format("2023_04_10", 10, "huawei_msate30", 1, custom_dataset_timestamp_size)
+        # aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}_integral_{}_{}_extract".format("2023_04_10", 11, "huawei_mate30", 1, custom_dataset_timestamp_size)
+        # aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}__extract".format("2023_04_13", 17, "huawei_mate30")
+        # aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}__extract".format("2023_04_13", 17, "huawei_mate30")
+        # aiimudr_dataset_file_name = "{}_drive_{:0>4}_phone_{}_piecewise_{}_{}_extract".format("2023_04_13", 17, "huawei_mate30", 1, 44386)
 
         aiimudr_dataset_ground_truth_rotation_matrix = custom_parse_data.loc[
                                            :,

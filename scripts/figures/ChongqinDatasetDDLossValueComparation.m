@@ -40,11 +40,14 @@ cDatasetLevel4TrackFolderNameList = [...
     ];
 cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameList);
 
-
 % TODO: S2.1: 配置调试模式
 cDebug = true;
 % cDebug = false;
 
+boxplotg = [];
+boxplotx = [];
+
+datasetVE = [];
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);
     log2terminal('E',TAG,logMsg);
@@ -56,7 +59,7 @@ else
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
 
         if cDebug
-            if ~strcmp(tDatasetLevel4TrackFolderName,"0008")
+            if ~strcmp(tDatasetLevel4TrackFolderName,"0009")
                 continue;
             end
         end
@@ -81,17 +84,7 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    plotFilterState(tDatasetLevel5FolderPhonePath);
-
-                    % plotComparedTrackPositionCustomDataDriven(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
-
-                    % plotComparedTrackPositionMultipleDataDriven(tDatasetLevel5FolderPhonePath);
-
-                    % plotStateTrajectory(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
-
-                    % plotDeepOriTestData(1,tDatasetLevel5FolderPhonePath);
-
-                    % plotDeepOdoTestData(1,tDatasetLevel5FolderPhonePath);
+                    plotDDOriLossValueComparation(tDatasetLevel5FolderPhonePath);
 
                 end
             end
@@ -100,6 +93,92 @@ else
     end
     % Tail iterate drive_id
 end
+
+figureObject = boxplot(boxplotx,boxplotg);
+
+printFolderPath = cDatasetLevel3ReorganizedFolderPath;
+saveFigFileName = "VelocityErrorBoxPlot";
+
+% Legend 属性
+% 字体
+% set(legendHandle,'FontName','Times New Roman');
+% set(legendHandle,'FontSize',10);
+
+xlabel("Seq");
+ylabel("Velocity error (m/s)");
+
+grid on;
+
+% Preparation of Articles for IEEE TRANSACTIONS and JOURNALS (2022)
+% IV. GUIDELINES FOR GRAPHICS PREPARATION AND SUBMISSION
+
+% H. Accepted Fonts Within Figures
+% Times New Roman,
+% Helvetica, Arial
+% Cambria
+% Symbol
+% Axes 属性
+% https://ww2.mathworks.cn/help/matlab/ref/matlab.graphics.axis.axes-properties.html
+% 字体
+set(gca,'FontName','Times New Roman');
+
+% I. Using Labels Within Figures
+% Figure labels should be legible, approximately 8- to 10-point type.
+% 字体大小
+set(gca,'FontSize',10);
+
+saveFigFilePath = fullfile(printFolderPath,saveFigFileName);
+saveas(gcf,saveFigFilePath,'fig')
+
+% D. Sizing of Graphics
+% one column wide (3.5 inches / 88 mm / 21 picas)
+% page wide (7.16 inches / 181 millimeters / 43 picas)
+% maximum depth ( 8.5 inches / 216 millimeters / 54 picas)
+% https://www.mathworks.com/help/matlab/ref/matlab.ui.figure-properties.html
+% Figure 属性
+% 位置和大小
+figurePropertiesPositionLeft = 0;
+figurePropertiesPositionBottom = 0;
+figurePropertiesPositionWidth = 18.1;
+figureAspectRatio = 4/3;
+figurePropertiesPositionHeight = figurePropertiesPositionWidth/figureAspectRatio;
+figurePropertiesPosition = [ ...
+    figurePropertiesPositionLeft ...
+    figurePropertiesPositionBottom ...
+    figurePropertiesPositionWidth ...
+    figurePropertiesPositionHeight ...
+    ];
+set(gcf,'Units','centimeters');
+set(gcf,'Position',figurePropertiesPosition);
+% 打印和导出
+set(gcf,'PaperUnits','centimeters');
+set(gcf,'PaperOrientation','landscape');
+figurePropertiesPaperSize = [figurePropertiesPositionWidth figurePropertiesPositionHeight];
+set(gcf,'PaperSize',figurePropertiesPaperSize);
+set(gcf,'PaperPosition',figurePropertiesPosition);
+
+% 位置
+set(gca,'Units','centimeters');
+set(gca,'OuterPosition',gcf().Position);
+
+hold off;
+
+printFileName = strcat(saveFigFileName,".png");
+printFilePath = fullfile(printFolderPath,printFileName);
+% C. File Formats for Graphics
+% PostScript (PS)
+% Encapsulated PostScript (.EPS)
+% Tagged Image File Format (.TIFF)
+% Portable Document Format (.PDF)
+% JPEG
+% Portable Network Graphics (.PNG)
+% E. Resolution
+% Author photographs, color, and grayscale figures should be at least 300dpi. 
+% Line art, including tables should be a minimum of 600dpi.
+% print(gcf,printFilePath,'-dpng','-r600');
+exportgraphics(gcf,printFilePath,'Resolution',600)
+
+% close(figureObject);
 
 
 

@@ -135,8 +135,11 @@ class KITTIDataset(BaseDataset):
         # self.datasets_validatation_filter['2023_04_10_drive_0008_phone_huawei_mate30_extract'] = [0, 24800]
         # self.datasets_train_filter["2023_04_10_drive_0008_phone_huawei_mate30_extract"] = [0, 24800]
 
-        self.datasets_validatation_filter['2023_04_10_drive_0008_phone_google_pixel3_extract'] = [0, 24601]
-        self.datasets_train_filter["2023_04_10_drive_0008_phone_google_pixel3_extract"] = [0, 24601]
+        # self.datasets_validatation_filter['2023_04_10_drive_0008_phone_google_pixel3_extract'] = [0, 24601]
+        # self.datasets_train_filter["2023_04_10_drive_0008_phone_google_pixel3_extract"] = [0, 24601]
+
+        self.datasets_train_filter["2011_10_03_drive_0027_extract"] = [0, 45692]
+        self.datasets_validatation_filter['2011_10_03_drive_0027_extract'] = [0, 45692]
 
         for dataset_fake in KITTIDataset.datasets_fake:
             if dataset_fake in self.datasets:
@@ -584,7 +587,7 @@ class KITTIArgs():
 
         sample_rate = 200
 
-        continue_training = True
+        continue_training = False
 
         # choose what to do
         read_data = 0

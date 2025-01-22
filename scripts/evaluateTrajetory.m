@@ -1,10 +1,11 @@
-function [] = evaluateTrajetory(folderPath)
+function [] = evaluateTrajetory(folderPath,fileName)
 %UNTITLED2 此处显示有关此函数的摘要
 %   此处显示详细说明
 
 TAG = 'evaluateTrajetory';
 
-filterState = loadFilterStateIntegratedDataDriven(folderPath);
+% filterState = loadFilterStateIntegratedDataDriven(folderPath);
+filterState = loadFilterStateIntegratedCustomDataDriven(folderPath,fileName);
 preprocessRawFlatData = loadPreprocessRawFlat(folderPath);
 
 preprocessGroundTruthNavOrientationRotationMatrix = getPreprocessGroundTruthNavOrientationRotationMatrix(preprocessRawFlatData);
@@ -83,9 +84,10 @@ if ~isfolder(evaluationResultFolderPath)
     mkdir(evaluationResultFolderPath);
 end
 
-evaluationResultFileName = 'DDAttitude_FUncertainty_DDVelocity_FUncertainty.txt';
+[~,name,~] = fileparts(fileName);
+evaluationResultFileName = name + ".txt";
 evaluationResultFilePath = fullfile(evaluationResultFolderPath,evaluationResultFileName);
-% writematrix(evaluationSection, evaluationResultFilePath);
+writematrix(evaluationSection, evaluationResultFilePath);
 
 logMsg = sprintf('%.2f, %.2f, %.2f', ...
     rad2deg(meanRelativeRotationError*1e3), ...

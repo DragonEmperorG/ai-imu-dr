@@ -42,8 +42,8 @@ cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameLi
 
 
 % TODO: S2.1: 配置调试模式
-cDebug = true;
-% cDebug = false;
+% cDebug = true;
+cDebug = false;
 
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);

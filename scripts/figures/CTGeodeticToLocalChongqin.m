@@ -1,16 +1,21 @@
-% 重置工作区环境
-clearvars;
+%%% 重置工作区环境
+% 清除内存中的变量 
+% https://ww2.mathworks.cn/help/matlab/ref/clearvars.html
+clearvars; 
+% 关闭一个或多个图窗 
+% https://ww2.mathworks.cn/help/matlab/ref/close.html?s_tid=doc_ta
 close all;
+% 设置断点用于调试 
+% https://ww2.mathworks.cn/help/matlab/ref/dbstop.html?s_tid=doc_ta
 dbstop error;
-% clc;
 
 % 添加自定义工具类函数
 addpath(genpath(pwd));
+
+% 设置log标识
 fullpath = mfilename('fullpath');
 [folderPath,fileName]=fileparts(fullpath);
 TAG = fileName;
-
-SCRIPT_MODE = 0;
 
 % TODO: S1.1: 模型输入预处理文件夹 根目录
 % cDatasetFolderPath = 'C:\DoctorRelated\20230410重庆VDR数据采集';
@@ -42,9 +47,10 @@ cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameLi
 
 
 % TODO: S2.1: 配置调试模式
-cDebug = true;
-% cDebug = false;
+% cDebug = true;
+cDebug = false;
 
+tSequenceVelocityTable = [];
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);
     log2terminal('E',TAG,logMsg);
@@ -56,7 +62,7 @@ else
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
 
         if cDebug
-            if ~strcmp(tDatasetLevel4TrackFolderName,"0008")
+            if ~strcmp(tDatasetLevel4TrackFolderName,"0009")
                 continue;
             end
         end
@@ -81,17 +87,20 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    plotFilterState(tDatasetLevel5FolderPhonePath);
+                    cDayZeroOClockAlignFolderName = "dayZeroOClockAlign";
+                    tDayZeroOClockAlignFolderPath = fullfile(tDatasetLevel5FolderPhonePath,cDayZeroOClockAlignFolderName);
+                    cTrackSynchronizedFileName = "TrackSynchronized.csv";
+                    tTrackSynchronizedFilePath = fullfile(tDayZeroOClockAlignFolderPath,cTrackSynchronizedFileName);
+                    tTrackSynchronizedData = readmatrix(tTrackSynchronizedFilePath);
+                    cTrackGroundTruthNavFileName = "TrackGroundTruthNav.csv";
+                    tTrackGroundTruthNavFilePath = fullfile(tDayZeroOClockAlignFolderPath,cTrackGroundTruthNavFileName);
+                    tTrackGroundTruthNavData = readmatrix(tTrackGroundTruthNavFilePath);
 
-                    % plotComparedTrackPositionCustomDataDriven(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
+                    tClipHeadTime = ceil(tTrackSynchronizedData(1,1));
+                    tClipTailTime = floor(tTrackSynchronizedData(end,1));
 
-                    % plotComparedTrackPositionMultipleDataDriven(tDatasetLevel5FolderPhonePath);
-
-                    % plotStateTrajectory(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
-
-                    % plotDeepOriTestData(1,tDatasetLevel5FolderPhonePath);
-
-                    % plotDeepOdoTestData(1,tDatasetLevel5FolderPhonePath);
+                    tClipTrackGroundTruthNavData = tTrackGroundTruthNavData(tTrackGroundTruthNavData(:,1)>=tClipHeadTime&tTrackGroundTruthNavData(:,1)<=tClipTailTime,:);
+                    plotTrackGeodeticCoordinateTransformComparation(tDayZeroOClockAlignFolderPath,tClipTrackGroundTruthNavData(:,1:4));
 
                 end
             end
@@ -100,8 +109,3 @@ else
     end
     % Tail iterate drive_id
 end
-
-
-
-
-

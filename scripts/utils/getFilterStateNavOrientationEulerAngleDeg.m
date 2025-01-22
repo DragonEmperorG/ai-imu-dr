@@ -3,7 +3,10 @@ function [filterStateNavOrientationEulerAngleDeg] = getFilterStateNavOrientation
 %   此处显示详细说明
 
 filterStateNavOrientationRotationMatrix = getFilterStateNavOrientation(filterState);
-[filterStateNavOrientationEulerAnglePitch,filterStateNavOrientationEulerAngleRoll,filterStateNavOrientationEulerAngleYaw] = dcm2angle(filterStateNavOrientationRotationMatrix,'XYZ');
-filterStateNavOrientationEulerAngleDeg = rad2deg(horzcat(filterStateNavOrientationEulerAnglePitch,filterStateNavOrientationEulerAngleRoll,filterStateNavOrientationEulerAngleYaw));
+% [filterStateNavOrientationEulerAnglePitch,filterStateNavOrientationEulerAngleRoll,filterStateNavOrientationEulerAngleYaw] = dcm2angle(filterStateNavOrientationRotationMatrix,'XYZ');
+% filterStateNavOrientationEulerAngleDeg = rad2deg(horzcat(filterStateNavOrientationEulerAnglePitch,filterStateNavOrientationEulerAngleRoll,filterStateNavOrientationEulerAngleYaw));
+
+filterStateNavOrientationEulerAngle = rotm2eul(filterStateNavOrientationRotationMatrix,'XYZ');
+filterStateNavOrientationEulerAngleDeg = rad2deg(filterStateNavOrientationEulerAngle);
 
 end

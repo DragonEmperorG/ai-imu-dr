@@ -1,0 +1,13 @@
+function [rDataDrivenMeasurementDrivenOrientation] = loadKittiDataDrivenMeasurementOrientation(folderPath)
+%UNTITLED2 此处提供此函数的摘要
+%   此处提供详细说明
+
+cDataDrivenMeasurementOrientationFileName = "ModelDeepOriInput6DInput100HzInputHSOutputNS.txt";
+
+tDataDrivenMeasurementOrientationFilePath = fullfile(folderPath,cDataDrivenMeasurementOrientationFileName);
+tDataDrivenMeasurementOrientationRaw = readmatrix(tDataDrivenMeasurementOrientationFilePath);
+tDataDrivenMeasurementOrientationFlat = tDataDrivenMeasurementOrientationRaw(:,2:end);
+
+rDataDrivenMeasurementDrivenOrientation = convertOrientationFlatToRotationMatrix(tDataDrivenMeasurementOrientationFlat);
+
+end

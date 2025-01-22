@@ -5,12 +5,21 @@ dbstop error;
 % clc;
 
 % 添加自定义工具类函数
-addpath(genpath(pwd));
+% pwdpath = genpath(pwd);
+utilspath = fullfile('..','utils');
+addpath(utilspath);
 fullpath = mfilename('fullpath');
 [folderPath,fileName]=fileparts(fullpath);
 TAG = fileName;
 
-SCRIPT_MODE = 0;
+S2MS = 1e3;
+MS2S = 1/S2MS;
+S2NS = 1e9;
+NS2S = 1/S2NS;
+MS2NS = 1e6;
+NS2MS = 1/MS2NS;
+US2NS = 1e3;
+NS2US = 1/US2NS;
 
 % TODO: S1.1: 模型输入预处理文件夹 根目录
 % cDatasetFolderPath = 'C:\DoctorRelated\20230410重庆VDR数据采集';
@@ -39,12 +48,27 @@ cDatasetLevel4TrackFolderNameList = [...
     "0018" ...
     ];
 cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameList);
+cPaletteViridisCategories11Color = [
+    "#fde725",...
+    "#bddf26",...
+    "#7ad151",...
+    "#44bf70",...
+    "#22a884",...
+    "#21918c",...
+    "#2a788e",...
+    "#355f8d",...
+    "#414487",...
+    "#482475",...
+    "#440154"
+];
+
 
 
 % TODO: S2.1: 配置调试模式
-cDebug = true;
-% cDebug = false;
+% cDebug = true;
+cDebug = false;
 
+tSequenceGnssMeasurementEventTable = [];
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);
     log2terminal('E',TAG,logMsg);
@@ -54,54 +78,22 @@ else
     for i = 1:cDatasetLevel4TrackFolderNameListLength
         logTrackNumerator = i;
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
+        tTrackNumber = str2double(tDatasetLevel4TrackFolderName);
 
         if cDebug
-            if ~strcmp(tDatasetLevel4TrackFolderName,"0008")
+            if ~strcmp(tDatasetLevel4TrackFolderName,"0009")
                 continue;
             end
         end
 
         tDatasetLevel4TrackFolderPath = fullfile(cDatasetLevel3ReorganizedFolderPath,tDatasetLevel4TrackFolderName);
         if isfolder(tDatasetLevel4TrackFolderPath)
-            tDatasetLevel4TrackFolderDir = dir(tDatasetLevel4TrackFolderPath);
-            tDatasetLevel4TrackFolderDirLength = length(tDatasetLevel4TrackFolderDir);
-            % Head iterate phone_name
-            for j = 1:tDatasetLevel4TrackFolderDirLength
-                tDatasetLevel5FolderPhoneName = tDatasetLevel4TrackFolderDir(j).name;
-                if ~strcmp(tDatasetLevel5FolderPhoneName,'.') && ~strcmp(tDatasetLevel5FolderPhoneName,'..') && tDatasetLevel4TrackFolderDir(j).isdir
-
-                    if ~strcmp(tDatasetLevel5FolderPhoneName,'HUAWEI_Mate30')
-                        continue;
-                    end
-
-                    tDatasetLevel5FolderPhonePath = fullfile(tDatasetLevel4TrackFolderPath,tDatasetLevel5FolderPhoneName);
-                    logMsg = sprintf('drive id: %s (%d/%d), phone name: %s', ...
-                        tDatasetLevel4TrackFolderName, logTrackNumerator, logTrackDenominator, ...
-                        tDatasetLevel5FolderPhoneName ...
-                        );
-                    log2terminal('I',TAG,logMsg);
-
-                    plotFilterState(tDatasetLevel5FolderPhonePath);
-
-                    % plotComparedTrackPositionCustomDataDriven(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
-
-                    % plotComparedTrackPositionMultipleDataDriven(tDatasetLevel5FolderPhonePath);
-
-                    % plotStateTrajectory(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
-
-                    % plotDeepOriTestData(1,tDatasetLevel5FolderPhonePath);
-
-                    % plotDeepOdoTestData(1,tDatasetLevel5FolderPhonePath);
-
-                end
-            end
-            % Tail iterate phone_name
+            logMsg = sprintf('drive id: %s (%d/%d)',tDatasetLevel4TrackFolderName,logTrackNumerator,logTrackDenominator);
+            log2terminal('I',TAG,logMsg);
+            % plotComparedTrackImuData(tDatasetLevel4TrackFolderPath);
+            plotTrackGnssClockImuDataCrossCorrelation(tDatasetLevel4TrackFolderPath);
         end
     end
     % Tail iterate drive_id
 end
-
-
-
-
 

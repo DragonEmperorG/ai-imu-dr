@@ -43,9 +43,17 @@ cDatasetLevel4TrackFolderNameListLength = length(cDatasetLevel4TrackFolderNameLi
 % 基于DeepOdo模型对比输入标准化和输出归一化的效果
 cModelDeepOdoInput7DInputNSOutputNSFileName = "ModelDeepOdoInput7DInputNSOutputNS.txt";
 cModelDeepOdoInput7DInputHSOutputNSFileName = "ModelDeepOdoInput7DInputHSOutputNS.txt";
+cModelDeepOdoInput7DInputHSOutputHSFileName = "ModelDeepOdoInput7DInputHSOutputHS.txt";
+cModelDeepOdoInput6DInputHSOutputNSFileName = "ModelDeepOdoInput6DInputHSOutputNS.txt";
+cModelDeepOdoInput6DInput100HzInputHSOutputNSFileName = "ModelDeepOdoInput6DInput100HzInputHSOutputNS.txt";
+cModelDeepOdoInput6DInput150HzInputHSOutputNSFileName = "ModelDeepOdoInput6DInput150HzInputHSOutputNS.txt";
+cModelDeepOdoInput6DInput200HzInputHSOutputNSFileName = "ModelDeepOdoInput6DInput200HzInputHSOutputNS.txt";
+cModelDeepOdoInput6DInput100HzInputHSOutputNSLoseDeltaVelocityFileName = "ModelDeepOdoInput6DInput100HzInputHSOutputNSLoseDeltaVelocity.txt";
 
-cComparedResultList = [cModelDeepOdoInput7DInputNSOutputNSFileName,cModelDeepOdoInput7DInputHSOutputNSFileName];
-
+% cComparedResultList = [cModelDeepOdoInput7DInputNSOutputNSFileName,cModelDeepOdoInput7DInputHSOutputNSFileName,cModelDeepOdoInput7DInputHSOutputHSFileName];
+% cComparedResultList = [cModelDeepOdoInput6DInputHSOutputNSFileName];
+% cComparedResultList = [cModelDeepOdoInput6DInput100HzInputHSOutputNSFileName,cModelDeepOdoInput6DInput150HzInputHSOutputNSFileName,cModelDeepOdoInput6DInput200HzInputHSOutputNSFileName];
+cComparedResultList = [cModelDeepOdoInput6DInput100HzInputHSOutputNSLoseDeltaVelocityFileName];
 
 % TODO: S2.1: 配置调试模式
 cDebug = true;
@@ -54,6 +62,7 @@ cDebug = true;
 boxplotg = [];
 boxplotx = [];
 
+datasetVE = [];
 if ~isfolder(cDatasetLevel3ReorganizedFolderPath)
     logMsg = sprintf('Not folder path %s',cDatasetLevel3ReorganizedFolderPath);
     log2terminal('E',TAG,logMsg);
@@ -65,7 +74,7 @@ else
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
 
         if cDebug
-            if ~strcmp(tDatasetLevel4TrackFolderName,"0008")
+            if ~strcmp(tDatasetLevel4TrackFolderName,"0012")
                 continue;
             end
         end
@@ -90,12 +99,21 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    velocityError = evaluateDataDrivenVelocity(tDatasetLevel5FolderPhonePath);
-                    boxplotx = [boxplotx;velocityError];
+                    groundTruthVelocity = loadDataDrivenVelocityGroundTruth(tDatasetLevel5FolderPhonePath);
+                    trackVE = [];
+                    for k = 1:length(cComparedResultList)
+                        dataDrivenVelocity = loadCustomDataDrivenVelocityMeasurement(tDatasetLevel5FolderPhonePath,cComparedResultList(k));
+                        [AVE1,AVE2] = evaluateAVE(groundTruthVelocity,dataDrivenVelocity);
+                        [RVE1,RVE2] = evaluateRVE(groundTruthVelocity,dataDrivenVelocity);
+                        trackVE = [trackVE,AVE1,AVE2,RVE1,RVE2];
+                        logMsg = sprintf('%s, AVE MAE: %.3f, AVE RMSE: %.3f; RVE MAE: %.3f, RVE RMSE: %.3f', ...
+                            cComparedResultList(k),AVE1,AVE2,RVE1,RVE2);
+                        log2terminal('I',TAG,logMsg);
+                    end
+                    datasetVE = [datasetVE;trackVE];
 
-                    seqString = sprintf('%02d', logTrackNumerator);
-                    velocityLabel = repmat({seqString},size(velocityError,1),1);
-                    boxplotg = [boxplotg;velocityLabel];
+                    % velocityLabel = repmat({seqString},size(velocityError,1),1);
+                    % boxplotg = [boxplotg;velocityLabel];
 
                 end
             end

@@ -3,7 +3,9 @@ function [filterStateCarOrientationEulerAngleDeg] = getFilterStateCarOrientation
 %   此处显示详细说明
 
 filterStateCarOrientationRotationMatrix = getFilterStateCarOrientation(filterState);
-[filterStateCarOrientationEulerAnglePitch,filterStateCarOrientationEulerAngleRoll,filterStateCarOrientationEulerAngleYaw] = dcm2angle(filterStateCarOrientationRotationMatrix,'XYZ');
-filterStateCarOrientationEulerAngleDeg = rad2deg(horzcat(filterStateCarOrientationEulerAnglePitch,filterStateCarOrientationEulerAngleRoll,filterStateCarOrientationEulerAngleYaw));
+% [filterStateCarOrientationEulerAnglePitch,filterStateCarOrientationEulerAngleRoll,filterStateCarOrientationEulerAngleYaw] = dcm2angle(filterStateCarOrientationRotationMatrix,'XYZ');
+% filterStateCarOrientationEulerAngleDeg = rad2deg(horzcat(filterStateCarOrientationEulerAnglePitch,filterStateCarOrientationEulerAngleRoll,filterStateCarOrientationEulerAngleYaw));
+
+filterStateCarOrientationEulerAngleDeg = convertOrientationRotationMatrixToEulerAngle(filterStateCarOrientationRotationMatrix,true);
 
 end
