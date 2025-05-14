@@ -56,7 +56,7 @@ else
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
 
         if cDebug
-            if ~strcmp(tDatasetLevel4TrackFolderName,"0014")
+            if ~strcmp(tDatasetLevel4TrackFolderName,"0008")
                 continue;
             end
         end
@@ -86,7 +86,7 @@ else
 
                     % plotPreprocessImuMeasurement(tDatasetLevel5FolderPhonePath);
 
-                    plotFilterState(tDatasetLevel5FolderPhonePath);
+                    % plotFilterState(tDatasetLevel5FolderPhonePath);
 
                     plotComparedTrackPosition(tDatasetLevel5FolderPhonePath);
 

@@ -1,3 +1,5 @@
+%%% 小论文图片生成脚本
+
 % 重置工作区环境
 clearvars;
 close all;
@@ -110,7 +112,9 @@ else
                     hold on;
                     lineObject = geoplot(geographicAxesObject,tGroundTruthNavDataLatitude,tGroundTruthNavDataLongitude);
                     set(lineObject,'LineWidth',1.2);
-                    set(lineObject,'DisplayName',extractAfter(tDatasetLevel4TrackFolderName,2));
+                    % tDisplayName = extractAfter(tDatasetLevel4TrackFolderName,2);
+                    tDisplayName = sprintf("%02d",logTrackNumerator);
+                    set(lineObject,'DisplayName',tDisplayName);
                     hold off;
                 end
             end
@@ -122,9 +126,15 @@ end
 
 legend();
 
+% gx.LatitudeLimits  = [dms2degrees([29 27 11.4]) dms2degrees([29 27 14.6])];
+% gx.LongitudeLimits = [dms2degrees([106 28 15.9]) dms2degrees([106 28 20])];
+
 % 字体
-set(geographicAxesObject,'FontName','Times New Roman');
-set(geographicAxesObject,'FontSize',10.5);
+% set(geographicAxesObject,'FontName','Times New Roman');
+% set(geographicAxesObject,'FontSize',10.5);
+
+set(geographicAxesObject,'FontName','Arial');
+set(geographicAxesObject,'FontSize',8);
 
 % 标尺
 cLatitudeAxisTickInterval = 0.5/3600;
@@ -147,22 +157,34 @@ tLongitudeAxisTail = tGeographicAxesCenter(2) + cLongitudeAxisTickInterval * cLo
 tLongitudeAxisTickValues = tLongitudeAxisHead:cLongitudeAxisTickInterval:tLongitudeAxisTail;
 set(get(geographicAxesObject,'LongitudeAxis'),'TickValues',tLongitudeAxisTickValues);
 
+geolimits([dms2degrees([29 27 11.5]) dms2degrees([29 27 14.5])],[dms2degrees([106 28 16]) dms2degrees([106 28 20])]);
+
 % 网格
-set(geographicAxesObject,'GridLineStyle','--');
-set(geographicAxesObject,'GridColor','w');
-set(geographicAxesObject,'GridAlpha',0.5);
+% set(geographicAxesObject,'GridLineStyle','--');
+% set(geographicAxesObject,'GridColor','w');
+% set(geographicAxesObject,'GridAlpha',0.5);
 
 % 标签
-set(get(geographicAxesObject,'LatitudeLabel'),'String','纬度');
-set(get(geographicAxesObject,'LatitudeLabel'),'FontName','宋体');
-set(get(geographicAxesObject,'LongitudeLabel'),'String','经度');
-set(get(geographicAxesObject,'LongitudeLabel'),'FontName','宋体');
+% set(get(geographicAxesObject,'LatitudeLabel'),'String','纬度');
+% set(get(geographicAxesObject,'LatitudeLabel'),'FontName','宋体');
+% set(get(geographicAxesObject,'LongitudeLabel'),'String','经度');
+% set(get(geographicAxesObject,'LongitudeLabel'),'FontName','宋体');
+
+set(get(geographicAxesObject,'LatitudeLabel'),'String','Latitude');
+% set(get(geographicAxesObject,'LatitudeLabel'),'FontName','Times New Roman');
+set(get(geographicAxesObject,'LatitudeLabel'),'FontName','Arial');
+set(get(geographicAxesObject,'LongitudeLabel'),'String','Longitude');
+% set(get(geographicAxesObject,'LongitudeLabel'),'FontName','Times New Roman');
+set(get(geographicAxesObject,'LongitudeLabel'),'FontName','Arial');
+
 
 set(get(geographicAxesObject,'Legend'),'Location','northeastoutside');
 % set(get(geographicAxesObject,'Legend'),'Orientation','horizontal');
 % set(get(geographicAxesObject,'Legend'),'NumColumns',5);
 set(get(geographicAxesObject,'Legend'),'FontName','Times New Roman');
-set(get(geographicAxesObject,'Legend'),'FontSize',10.5);
+set(get(geographicAxesObject,'Legend'),'FontName','Arial');
+% set(get(geographicAxesObject,'Legend'),'FontSize',10.5);
+set(get(geographicAxesObject,'Legend'),'FontSize',8);
 
 % http://gs.xjtu.edu.cn/info/1209/7605.htm
 % 参考《西安交通大学博士、硕士学位论文模板（2021版）》中对图的要求
@@ -171,8 +193,10 @@ set(get(geographicAxesObject,'Legend'),'FontSize',10.5);
 % 大小应该一致，编排美观、整齐；
 figurePropertiesPositionLeft = 0;
 figurePropertiesPositionBottom = 0;
-figurePropertiesPositionWidth = 16;
-figurePropertiesPositionHeight = 9;
+figurePropertiesPositionWidth = 17;
+figureAspectRatio = 4/3;
+figurePropertiesPositionHeight = figurePropertiesPositionWidth/figureAspectRatio;
+figurePropertiesPositionHeight = 12.3;
 figurePropertiesPosition = [ ...
     figurePropertiesPositionLeft ...
     figurePropertiesPositionBottom ...
@@ -188,7 +212,7 @@ figurePropertiesPaperSize = [figurePropertiesPositionWidth figurePropertiesPosit
 set(gcf,'PaperSize',figurePropertiesPaperSize);
 set(gcf,'PaperPosition',figurePropertiesPosition);
 
-cChongqinDatasetOverviewFilePath = fullfile(ccDatasetLevel2CollectionDateFolderPath,'ChongqinDatasetOverview.png');
+cChongqinDatasetOverviewFilePath = fullfile(ccDatasetLevel2CollectionDateFolderPath,'ChongqinDatasetOverview1.png');
 exportgraphics(gcf,cChongqinDatasetOverviewFilePath,'Resolution',600);
 
 % close(figureMapHandle);

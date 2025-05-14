@@ -6,7 +6,7 @@ filterStateNavOrientationRotationMatrix = getFilterStateNavOrientation(filterSta
 % [filterStateNavOrientationEulerAnglePitch,filterStateNavOrientationEulerAngleRoll,filterStateNavOrientationEulerAngleYaw] = dcm2angle(filterStateNavOrientationRotationMatrix,'XYZ');
 % filterStateNavOrientationEulerAngleDeg = rad2deg(horzcat(filterStateNavOrientationEulerAnglePitch,filterStateNavOrientationEulerAngleRoll,filterStateNavOrientationEulerAngleYaw));
 
-filterStateNavOrientationEulerAngle = rotm2eul(filterStateNavOrientationRotationMatrix,'XYZ');
-filterStateNavOrientationEulerAngleDeg = rad2deg(filterStateNavOrientationEulerAngle);
+filterStateNavOrientationEulerAngle = rotm2eul(filterStateNavOrientationRotationMatrix,'ZYX');
+filterStateNavOrientationEulerAngleDeg = rad2deg(filterStateNavOrientationEulerAngle(:,[3,2,1]));
 
 end

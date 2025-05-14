@@ -127,6 +127,6 @@ printFilePath = fullfile(printFolderPath,printFileName);
 % print(gcf,printFilePath,'-dpng','-r600');
 exportgraphics(gcf,printFilePath,'Resolution',600)
 
-close(figureHandle);
+% close(figureHandle);
 
 end

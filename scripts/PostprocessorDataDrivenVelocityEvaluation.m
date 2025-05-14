@@ -1,3 +1,5 @@
+%%% 小论文图片生成脚本 Fig. 9
+
 % 重置工作区环境
 clearvars;
 close all;
@@ -48,8 +50,8 @@ cComparedResultList = [cModelDeepOdoInput7DInputNSOutputNSFileName,cModelDeepOdo
 
 
 % TODO: S2.1: 配置调试模式
-cDebug = true;
-% cDebug = false;
+% cDebug = true;
+cDebug = false;
 
 boxplotg = [];
 boxplotx = [];
@@ -115,10 +117,12 @@ saveFigFileName = "VelocityErrorBoxPlot";
 % set(legendHandle,'FontName','Times New Roman');
 % set(legendHandle,'FontSize',10);
 
-xlabel("Seq");
+xlabel("Sequence number");
 ylabel("Velocity error (m/s)");
 
-grid on;
+% grid on;
+
+ylim([-3 2]);
 
 % Preparation of Articles for IEEE TRANSACTIONS and JOURNALS (2022)
 % IV. GUIDELINES FOR GRAPHICS PREPARATION AND SUBMISSION
@@ -131,12 +135,12 @@ grid on;
 % Axes 属性
 % https://ww2.mathworks.cn/help/matlab/ref/matlab.graphics.axis.axes-properties.html
 % 字体
-set(gca,'FontName','Times New Roman');
+set(gca,'FontName','Arial');
 
 % I. Using Labels Within Figures
 % Figure labels should be legible, approximately 8- to 10-point type.
 % 字体大小
-set(gca,'FontSize',10);
+set(gca,'FontSize',8);
 
 saveFigFilePath = fullfile(printFolderPath,saveFigFileName);
 saveas(gcf,saveFigFilePath,'fig')
@@ -150,7 +154,7 @@ saveas(gcf,saveFigFilePath,'fig')
 % 位置和大小
 figurePropertiesPositionLeft = 0;
 figurePropertiesPositionBottom = 0;
-figurePropertiesPositionWidth = 18.1;
+figurePropertiesPositionWidth = 17;
 figureAspectRatio = 4/3;
 figurePropertiesPositionHeight = figurePropertiesPositionWidth/figureAspectRatio;
 figurePropertiesPosition = [ ...

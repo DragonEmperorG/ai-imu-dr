@@ -21,6 +21,8 @@ if plotFlag ~= 0
     legendObject = legend;
     hold off;
 
+    box on;
+
     % Line 属性
     % 线条
     set(lineObject1,'Color',"r");
@@ -29,14 +31,14 @@ if plotFlag ~= 0
     set(lineObject2,'LineStyle',"--");
 
     % 图例
-    set(lineObject1,'DisplayName',"Ground Truth");
-    set(lineObject2,'DisplayName',"Proposed");
+    set(lineObject1,'DisplayName',"Ground truth forward velocity");
+    set(lineObject2,'DisplayName',"Proposed forward velocity");
 
     % Legend 属性
     % Position and Layout 位置和布局
     set(legendObject,'Location','northeast');
-    set(legendObject,'FontName','Times New Roman');
-    set(legendObject,'FontSize',10);
+    set(legendObject,'FontName','Arial');
+    set(legendObject,'FontSize',8);
 
     % Preparation of Articles for IEEE TRANSACTIONS and JOURNALS (2022)
     % IV. GUIDELINES FOR GRAPHICS PREPARATION AND SUBMISSION
@@ -49,31 +51,33 @@ if plotFlag ~= 0
     % Axes 属性
     % https://ww2.mathworks.cn/help/matlab/ref/matlab.graphics.axis.axes-properties.html
     % 字体
-    set(gca,'FontName','Times New Roman');
+    set(gca,'FontName','Arial');
 
     % I. Using Labels Within Figures
     % Figure labels should be legible, approximately 8- to 10-point type.
     % 字体大小
-    set(gca,'FontSize',10);
+    set(gca,'FontSize',8);
+
+    set(gca,'YTickLabel',{'-0.5','0','0.5','1.0','1.5','2.0','2.5','3.0','3.5','4.0'});
 
     % 标尺
     % 平移坐标轴
     axesObjectXlimProperty = xlim;
     axesObjectXlimProperty = axesObjectXlimProperty + [0 -30];
     set(gca,'XLim',axesObjectXlimProperty);
-    axesObjectYlimProperty = ylim;
-    axesObjectYlimProperty = axesObjectYlimProperty + [0.5 0.5];
-    set(gca,'YLim',axesObjectYlimProperty);
+    % axesObjectYlimProperty = ylim;
+    % axesObjectYlimProperty = axesObjectYlimProperty + [0.5 0.5];
+    % set(gca,'YLim',axesObjectYlimProperty);
 
     % 网格
-    set(gca,'XGrid','on');
-    set(gca,'YGrid','on');
-    set(gca,'ZGrid','on');
-
-    set(gca,'XMinorGrid','on');
-    set(gca,'YMinorGrid','on');
-    set(gca,'ZMinorGrid','on');
-    set(gca,'MinorGridLineStyle','--');
+    % set(gca,'XGrid','on');
+    % set(gca,'YGrid','on');
+    % set(gca,'ZGrid','on');
+    % 
+    % set(gca,'XMinorGrid','on');
+    % set(gca,'YMinorGrid','on');
+    % set(gca,'ZMinorGrid','on');
+    % set(gca,'MinorGridLineStyle','--');
 
     printFolderPath = fullfile(folderPath,'DATASET_DEEPODO');
     saveFigFileName = "DeepOdoTestData";
@@ -128,7 +132,7 @@ if plotFlag ~= 0
     % print(gcf,printFilePath,'-dpng','-r600');
     exportgraphics(gcf,printFilePath,'Resolution',600)
 
-    close(figureHandle);
+    % close(figureHandle);
 
 end
 

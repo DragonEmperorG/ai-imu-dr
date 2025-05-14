@@ -15,6 +15,6 @@ function [] = plotFilterState(folderPath)
     % 
     % plotFilterStateCovarianceCarSE(folderPath);
 
-    plotFilterStateCombination(folderPath);
+    % plotFilterStateCombination(folderPath);
 
 end

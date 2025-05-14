@@ -36,9 +36,11 @@ if plotFlag ~= 0
     lineObject23 = plot(pX2,pY2(:,3));
     % title('Output Nav orientation euler angle');
     xlabel("Time (s)");
-    ylabel("Euler Angle (deg)");
+    ylabel("Euler angle (°)");
     legend1 = legend();
     hold off;
+
+    box on;
 
     % Line 属性
     % 线条
@@ -54,19 +56,19 @@ if plotFlag ~= 0
     set(lineObject13,'LineStyle',"--");
 
     % 图例
-    set(lineObject11,'DisplayName',"Ground Truth Euler Angle Pitch");
-    set(lineObject12,'DisplayName',"Ground Truth Euler Angle Roll");
-    set(lineObject13,'DisplayName',"Ground Truth Euler Angle Yaw");
-    set(lineObject21,'DisplayName',"Proposed Euler Angle Pitch");
-    set(lineObject22,'DisplayName',"Proposed Euler Angle Roll");
-    set(lineObject23,'DisplayName',"Proposed Euler Angle Yaw");
+    set(lineObject11,'DisplayName',"Ground truth euler angle pitch");
+    set(lineObject12,'DisplayName',"Ground truth euler angle roll");
+    set(lineObject13,'DisplayName',"Ground truth euler angle yaw");
+    set(lineObject21,'DisplayName',"Proposed euler angle pitch");
+    set(lineObject22,'DisplayName',"Proposed euler angle roll");
+    set(lineObject23,'DisplayName',"Proposed euler angle yaw");
 
     % Legend 属性
     % Position and Layout 位置和布局
-    set(legend1,'Location','north');
+    set(legend1,'Location','northoutside');
     set(legend1,'NumColumns',2);
-    set(legend1,'FontName','Times New Roman');
-    set(legend1,'FontSize',10);
+    set(legend1,'FontName','Arial');
+    set(legend1,'FontSize',8);
 
     % Preparation of Articles for IEEE TRANSACTIONS and JOURNALS (2022)
     % IV. GUIDELINES FOR GRAPHICS PREPARATION AND SUBMISSION
@@ -79,31 +81,34 @@ if plotFlag ~= 0
     % Axes 属性
     % https://ww2.mathworks.cn/help/matlab/ref/matlab.graphics.axis.axes-properties.html
     % 字体
-    set(gca,'FontName','Times New Roman');
+    set(gca,'FontName','Arial');
 
     % I. Using Labels Within Figures
     % Figure labels should be legible, approximately 8- to 10-point type.
     % 字体大小
-    set(gca,'FontSize',10);
+    set(gca,'FontSize',8);
+
+    set(gca,'YTick',-180:30:180);
 
     % 标尺
     % 平移坐标轴
     axesObjectXlimProperty = xlim;
-    axesObjectXlimProperty = axesObjectXlimProperty + [0 -80];
+    axesObjectXlimProperty = axesObjectXlimProperty + [0 -30];
     set(gca,'XLim',axesObjectXlimProperty);
-    axesObjectYlimProperty = ylim;
-    axesObjectYlimProperty = axesObjectYlimProperty + [0 60];
-    set(gca,'YLim',axesObjectYlimProperty);
+    % axesObjectYlimProperty = ylim;
+    % axesObjectYlimProperty = axesObjectYlimProperty + [0 60];
+    % set(gca,'YLim',axesObjectYlimProperty);
+    set(gca,'YLim',[-180 180]);
 
-    % 网格
-    set(gca,'XGrid','on');
-    set(gca,'YGrid','on');
-    set(gca,'ZGrid','on');
-
-    set(gca,'XMinorGrid','on');
-    set(gca,'YMinorGrid','on');
-    set(gca,'ZMinorGrid','on');
-    set(gca,'MinorGridLineStyle','--');
+    % % 网格
+    % set(gca,'XGrid','on');
+    % set(gca,'YGrid','on');
+    % set(gca,'ZGrid','on');
+    % 
+    % set(gca,'XMinorGrid','on');
+    % set(gca,'YMinorGrid','on');
+    % set(gca,'ZMinorGrid','on');
+    % set(gca,'MinorGridLineStyle','--');
 
     printFolderPath = fullfile(folderPath,'DATASET_DEEPORI');
     saveFigFileName = "DeepOriTestData";
@@ -119,7 +124,7 @@ if plotFlag ~= 0
     % 位置和大小
     figurePropertiesPositionLeft = 0;
     figurePropertiesPositionBottom = 0;
-    figurePropertiesPositionWidth = 18.1;
+    figurePropertiesPositionWidth = 17;
     figureAspectRatio = 4/3;
     figurePropertiesPositionHeight = figurePropertiesPositionWidth/figureAspectRatio;
     figurePropertiesPosition = [ ...
@@ -158,7 +163,7 @@ if plotFlag ~= 0
     % print(gcf,printFilePath,'-dpng','-r600');
     exportgraphics(gcf,printFilePath,'Resolution',600)
 
-    close(figureHandle);
+    % close(figureHandle);
 
 end
 

@@ -1,4 +1,4 @@
-function [MAE1,RMSE1,MAE2,RMSE2,MAE3,RMSE3,MAE4,RMSE4] = evaluateRPEDeltaDist(rSE,pSE,dD)
+function [MAE1,RMSE1,MAE2,RMSE2,MAE3,RMSE3,MAE4,RMSE4] = rSE(:,1:2)DeltaDist(rSE,pSE,dD)
 
 tRelativeTimeSectionHead = dD(:,1);
 tRelativeTimeSectionTail = dD(:,2);

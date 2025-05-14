@@ -3,7 +3,6 @@ function [] = saveFilterStateIntegratedCombinationDataDriven(folderPath,fileName
 %   此处显示详细说明
 
 % 定义输出
-cFilterResultFileName = 'IntegratedDataDriven.mat';
 cFilterResultFilePath = fullfile(folderPath,'DATASET_QAIIMUDEADRECKONING',fileName);
 
 sIntegratedDataDrivenFilterState = filterState;

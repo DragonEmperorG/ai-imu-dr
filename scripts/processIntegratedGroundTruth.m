@@ -59,7 +59,10 @@ for i = 2:filterTimeLength
     orientationMeasurement = cell(1,2);
     orientationMeasurement{1,1} = tMeasurementNavOrientation;
     orientationMeasurement{1,2} = preprocessGroundTruthNavOrientationCovarianceMatrix;
-    tFilterStateCell = filterUpdateOrientationMeasurement(tFilterStateCell,orientationMeasurement);
+    % tFilterStateCell = filterUpdateOrientationMeasurement(tFilterStateCell,orientationMeasurement);
+    if mod(i,200) == 0
+        tFilterStateCell = filterUpdateOrientationMeasurement(tFilterStateCell,orientationMeasurement);
+    end
 
     velocityMeasurement = cell(1,2);
     velocityMeasurement{1,1} = tMeasurementNavVelocity;
@@ -67,6 +70,9 @@ for i = 2:filterTimeLength
     % tFilterStateCell = filterUpdateVelocityMeasurement(tFilterStateCell,velocityMeasurement);
     % tFilterStateCell = filterUpdateVelocityZMeasurement(tFilterStateCell,velocityMeasurement);
 
+    if mod(i,200) == 0
+        tFilterStateCell = filterUpdateVelocityMeasurement(tFilterStateCell,velocityMeasurement);
+    end
 
     % if mod(i,200*60) == 0
     %     positionMeasurement = cell(1,2);
@@ -87,5 +93,4 @@ for i = 2:filterTimeLength
 
 end
 
-% saveFilterStateIntegratedGroundTruth(folderPath,saveFilterState);
-saveFilterStateIntegratedCombinationDataDriven(folderPath,'IntegratedGTDataDriven.mat',saveFilterState);
+saveFilterStateIntegratedCombinationDataDriven(folderPath,'IntegratedGTDataDriven1.mat',saveFilterState);

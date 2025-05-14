@@ -91,6 +91,7 @@ updateStateMeasurementTransitionH(1:3,19:21) = updateStateJacobianC;
 measurementIndex = [1 3];
 updateStateMeasurementTransitionH = updateStateMeasurementTransitionH(measurementIndex,:);
 measurementCovarianceR = diag([1,3]);
+% measurementCovarianceR = diag([1, 1]);
 measurementError = - updateStateCarVelocityInCar([1 3]);
 
 updateStateMeasurementTransitionS = updateStateMeasurementTransitionH * propagateStateCovariance * updateStateMeasurementTransitionH' + measurementCovarianceR;

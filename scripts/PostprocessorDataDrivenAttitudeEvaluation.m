@@ -1,3 +1,5 @@
+%%% 小论文图片生成脚本 Fig. 8
+
 % 重置工作区环境
 clearvars;
 close all;
@@ -109,10 +111,12 @@ saveFigFileName = "AttitudeErrorBoxPlot";
 % set(legendHandle,'FontName','Times New Roman');
 % set(legendHandle,'FontSize',10);
 
-xlabel("Seq");
-ylabel("Attitude error (deg)");
+xlabel("Sequence number");
+ylabel("Attitude error (°)");
 
-grid on;
+ylim([0 45]);
+
+% grid on;
 
 % Preparation of Articles for IEEE TRANSACTIONS and JOURNALS (2022)
 % IV. GUIDELINES FOR GRAPHICS PREPARATION AND SUBMISSION
@@ -125,12 +129,12 @@ grid on;
 % Axes 属性
 % https://ww2.mathworks.cn/help/matlab/ref/matlab.graphics.axis.axes-properties.html
 % 字体
-set(gca,'FontName','Times New Roman');
+set(gca,'FontName','Arial');
 
 % I. Using Labels Within Figures
 % Figure labels should be legible, approximately 8- to 10-point type.
 % 字体大小
-set(gca,'FontSize',10);
+set(gca,'FontSize',8);
 
 saveFigFilePath = fullfile(printFolderPath,saveFigFileName);
 saveas(gcf,saveFigFilePath,'fig')
@@ -144,7 +148,7 @@ saveas(gcf,saveFigFilePath,'fig')
 % 位置和大小
 figurePropertiesPositionLeft = 0;
 figurePropertiesPositionBottom = 0;
-figurePropertiesPositionWidth = 18.1;
+figurePropertiesPositionWidth = 17;
 figureAspectRatio = 4/3;
 figurePropertiesPositionHeight = figurePropertiesPositionWidth/figureAspectRatio;
 figurePropertiesPosition = [ ...

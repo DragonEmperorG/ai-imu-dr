@@ -1,3 +1,5 @@
+%%% 小论文轨迹对比图生成文件
+
 % 重置工作区环境
 clearvars;
 close all;
@@ -56,7 +58,7 @@ else
         tDatasetLevel4TrackFolderName = cDatasetLevel4TrackFolderNameList(i);
 
         if cDebug
-            if ~strcmp(tDatasetLevel4TrackFolderName,"0008")
+            if ~strcmp(tDatasetLevel4TrackFolderName,"0012")
                 continue;
             end
         end
@@ -81,17 +83,25 @@ else
                         );
                     log2terminal('I',TAG,logMsg);
 
-                    plotFilterState(tDatasetLevel5FolderPhonePath);
+                    % plotFilterState(tDatasetLevel5FolderPhonePath);
 
-                    % plotComparedTrackPositionCustomDataDriven(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
+                    % plotComparedTrackPositionCustomDataDriven(tDatasetLevel5FolderPhonePath,'Integrated3DNHCATTDataDrivenClipped.mat');
 
+                    % 小论文 Fig. 7
                     % plotComparedTrackPositionMultipleDataDriven(tDatasetLevel5FolderPhonePath);
+
+                    % plotComparedClippedTrackPositionMultipleDataDriven(tDatasetLevel5FolderPhonePath);
+
+                    % 小论文 Fig. 6
+                    % plotComparedTrack0008PositionMultipleDataDriven(tDatasetLevel5FolderPhonePath);
 
                     % plotStateTrajectory(tDatasetLevel5FolderPhonePath,'IntegratedDataDriven.mat');
 
+                    % 小论文 Fig. 10
                     % plotDeepOriTestData(1,tDatasetLevel5FolderPhonePath);
 
-                    % plotDeepOdoTestData(1,tDatasetLevel5FolderPhonePath);
+                    % 小论文 Fig. 11
+                    plotDeepOdoTestData(1,tDatasetLevel5FolderPhonePath);
 
                 end
             end

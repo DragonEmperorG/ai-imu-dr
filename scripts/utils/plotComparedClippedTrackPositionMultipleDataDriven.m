@@ -1,40 +1,27 @@
-function [] = plotComparedTrackPositionMultipleDataDriven(folderPath)
+function [] = plotComparedClippedTrackPositionMultipleDataDriven(folderPath)
 %UNTITLED2 此处显示有关此函数的摘要、
 %   此处显示详细说明
 
 preprocessGroundTruthNavPosition = loadPreprocessGroundTruthNavPosition(folderPath);
 
-filterStateIntegrated2DNHCDataDriven = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated2DNHCDataDriven.mat');
-filterStateIntegrated3DNHCDataDriven = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated3DNHCDataDriven.mat');
-filterStateIntegrated2DNHCATTDataDriven = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated2DNHCATTDataDriven.mat');
-filterStateIntegratedDataDriven = loadFilterStateIntegratedCustomDataDriven(folderPath,'IntegratedDataDriven.mat');
-
-% filterStateIntegrated2DNHCDataDriven = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated2DNHCDataDrivenClipped.mat');
-% filterStateIntegrated3DNHCDataDriven = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated3DNHCDataDrivenClipped.mat');
-% filterStateIntegrated2DNHCATTDataDriven = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated2DNHCATTDataDrivenClipped.mat');
-% filterStateIntegratedDataDriven = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated3DNHCATTDataDrivenClipped.mat');
+filterState = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated2DNHCDataDriven.mat');
+filterStateClipped = loadFilterStateIntegratedCustomDataDriven(folderPath,'Integrated2DNHCDataDrivenClipped.mat');
 
 printFolderPath = fullfile(folderPath,'DATASET_QAIIMUDEADRECKONING');
 % TODO: 指定保存图片名称
-saveFigFileName = "ComparedMultipleTrackPosition2";
+saveFigFileName = "Compared2DNHCMethodWithStaticFactor";
 
-filterState1NavPosition = getFilterStateNavPosition(filterStateIntegrated2DNHCDataDriven);
-filterState2NavPosition = getFilterStateNavPosition(filterStateIntegrated3DNHCDataDriven);
-filterState3NavPosition = getFilterStateNavPosition(filterStateIntegrated2DNHCATTDataDriven);
-filterState4NavPosition = getFilterStateNavPosition(filterStateIntegratedDataDriven);
+filterState1NavPosition = getFilterStateNavPosition(filterState);
+filterState2NavPosition = getFilterStateNavPosition(filterStateClipped);
 
 figureHandle = figure;
 referencePosition = preprocessGroundTruthNavPosition;
-proposedPosition = filterState4NavPosition;
 filterPosition1 = filterState1NavPosition;
 filterPosition2 = filterState2NavPosition;
-filterPosition3 = filterState3NavPosition;
 hold on;
 referenceLineHandle = plot3(referencePosition(:,1),referencePosition(:,2),referencePosition(:,3));
 filterLineHandle1 = plot3(filterPosition1(:,1),filterPosition1(:,2),filterPosition1(:,3));
 filterLineHandle2 = plot3(filterPosition2(:,1),filterPosition2(:,2),filterPosition2(:,3));
-filterLineHandle3 = plot3(filterPosition3(:,1),filterPosition3(:,2),filterPosition3(:,3));
-proposedHandle = plot3(proposedPosition(:,1),proposedPosition(:,2),proposedPosition(:,3));
 
 % xlim([-50 55]);
 % ylim([-85 5]);
@@ -42,37 +29,32 @@ proposedHandle = plot3(proposedPosition(:,1),proposedPosition(:,2),proposedPosit
 % Line 属性
 % 线条
 set(referenceLineHandle,'Color',"r");
-set(proposedHandle,'Color',"b");
 set(filterLineHandle1,'Color',"c");
 set(filterLineHandle2,'Color',"m");
-set(filterLineHandle3,'Color',"g");
 
-set(referenceLineHandle,'LineStyle',"--");
 set(filterLineHandle1,'LineStyle',"-.");
 set(filterLineHandle2,'LineStyle',":");
 
 % 图例
-set(referenceLineHandle,'DisplayName',"Ground truth trajectory");
-set(proposedHandle,'DisplayName',"Proposed method trajectory");
-set(filterLineHandle1,'DisplayName',"AI-IMU method trajectory");
-set(filterLineHandle2,'DisplayName',"DeepOdo method trajectory");
-set(filterLineHandle3,'DisplayName',"DeepOri method trajectory");
+set(referenceLineHandle,'DisplayName',"Ground Truth");
+set(filterLineHandle1,'DisplayName',"AI-IMU");
+set(filterLineHandle2,'DisplayName',"DeepOdo");
 
 legendHandle = legend();
 % Legend 属性
 % 字体
-set(legendHandle,'FontName','Arial');
-set(legendHandle,'FontSize',8);
+set(legendHandle,'FontName','Times New Roman');
+set(legendHandle,'FontSize',10);
 % set(legendHandle,'NumColumn',2);
-set(legendHandle,'Location','northeastoutside');
+% set(legendHandle,'Location','north');
 
 % Axes 属性
 view([0 0 1]);
 axis equal;
 
-xlabel("East distance (m)");
-ylabel("North distance (m)");
-zlabel("Up distance (m)");
+xlabel("East (m)");
+ylabel("North (m)");
+zlabel("Up (m)");
 
 % Preparation of Articles for IEEE TRANSACTIONS and JOURNALS (2022)
 % IV. GUIDELINES FOR GRAPHICS PREPARATION AND SUBMISSION
@@ -85,18 +67,18 @@ zlabel("Up distance (m)");
 % Axes 属性
 % https://ww2.mathworks.cn/help/matlab/ref/matlab.graphics.axis.axes-properties.html
 % 字体
-set(gca,'FontName','Arial');
+set(gca,'FontName','Times New Roman');
 
 % I. Using Labels Within Figures
 % Figure labels should be legible, approximately 8- to 10-point type.
 % 字体大小
-set(gca,'FontSize',8);
+set(gca,'FontSize',10);
 
 % 网格
-% grid on;
-% 
-% grid minor;
-% set(gca,'MinorGridLineStyle','--');
+grid on;
+
+grid minor;
+set(gca,'MinorGridLineStyle','--');
 
 % 平移坐标轴 
 % axesObjectXlimProperty = xlim;
@@ -106,12 +88,8 @@ set(gca,'FontSize',8);
 % set(gca,'XLim',[-38, 66]);
 % set(gca,'YLim',[-84, 2]);
 
-set(gca,'XLim',[-50, 50]);
-set(gca,'YLim',[-90, 10]);
-
-set(gca,'XTick',-60:10:60);
-
-set(gca,'Box','on');
+set(gca,'XLim',[-38, 72]);
+set(gca,'YLim',[-90, 20]);
 
 saveFigFilePath = fullfile(printFolderPath,saveFigFileName);
 saveas(gcf,saveFigFilePath,'fig')
@@ -125,7 +103,7 @@ saveas(gcf,saveFigFilePath,'fig')
 % 位置和大小
 figurePropertiesPositionLeft = 0;
 figurePropertiesPositionBottom = 0;
-figurePropertiesPositionWidth = 17;
+figurePropertiesPositionWidth = 8;
 figureAspectRatio = 4/3;
 figurePropertiesPositionHeight = figurePropertiesPositionWidth/figureAspectRatio;
 figurePropertiesPosition = [ ...
@@ -164,6 +142,6 @@ printFilePath = fullfile(printFolderPath,printFileName);
 % print(gcf,printFilePath,'-dpng','-r600');
 exportgraphics(gcf,printFilePath,'Resolution',600)
 
-% close(figureHandle);
+close(figureHandle);
 
 end
